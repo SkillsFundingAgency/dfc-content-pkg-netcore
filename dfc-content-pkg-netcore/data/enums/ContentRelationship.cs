@@ -1,0 +1,31 @@
+﻿namespace dfc_content_pkg_netcore.enums
+{
+    public enum ContentRelationship
+    {
+        hasWitRestriction,
+        hasWitOtherRequirement,
+        hasWorkingLocation,
+        hasHtbDirectRoute,
+        hasWorkingEnvironment,
+        hasHtbOtherRoute,
+        hasDayToDayTask,
+        hasHtbApprenticeshipRoute,
+        hasONetOccupationalCode,
+        relatedOccupation,
+        hasHtbWorkRoute,
+        hasSocCode,
+        hasWorkingUniform,
+        hasApprenticeshipLink,
+        hasApprenticeshipRequirement,
+        hasHtbCollegeRoute,
+        hasHtbUniversityRoute,
+        hasHtbVolunteeringRoute,
+        requiresHtbRegistration,
+        hasCollegeRequirement,
+        hasCollegeLink,
+        hasRequirementsPrefix,
+        hasUniversityLink,
+        hasUniversityRequirement,
+        hasApprenticeshipStandard
+    }
+}
