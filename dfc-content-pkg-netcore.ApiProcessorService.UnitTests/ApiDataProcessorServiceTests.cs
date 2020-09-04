@@ -20,7 +20,7 @@ namespace dfc_cmsapi_pkg_netcore.ApiProcessorService.UnitTests
         public async Task ApiDataProcessorServiceGetReturnsSuccess()
         {
             // arrange
-            var expectedResult = new PagesSummaryItemModel
+            var expectedResult = new ApiSummaryItemModel
             {
                 Url = new Uri("https://somewhere.com"),
                 Title = "a-name",
@@ -34,7 +34,7 @@ namespace dfc_cmsapi_pkg_netcore.ApiProcessorService.UnitTests
             var apiDataProcessorService = new ApiDataProcessorService(fakeApiService);
 
             // act
-            var result = await apiDataProcessorService.GetAsync<PagesSummaryItemModel>(A.Fake<HttpClient>(), new Uri("https://somewhere.com")).ConfigureAwait(false);
+            var result = await apiDataProcessorService.GetAsync<ApiSummaryItemModel>(A.Fake<HttpClient>(), new Uri("https://somewhere.com")).ConfigureAwait(false);
 
             // assert
             A.CallTo(() => fakeApiService.GetAsync(A<HttpClient>.Ignored, A<Uri>.Ignored, A<string>.Ignored)).MustHaveHappenedOnceExactly();
@@ -45,14 +45,14 @@ namespace dfc_cmsapi_pkg_netcore.ApiProcessorService.UnitTests
         public async Task ApiDataProcessorServiceGetReturnsNullForNoData()
         {
             // arrange
-            PagesSummaryItemModel? expectedResult = null;
+            ApiSummaryItemModel? expectedResult = null;
 
             A.CallTo(() => fakeApiService.GetAsync(A<HttpClient>.Ignored, A<Uri>.Ignored, A<string>.Ignored)).Returns(string.Empty);
 
             var apiDataProcessorService = new ApiDataProcessorService(fakeApiService);
 
             // act
-            var result = await apiDataProcessorService.GetAsync<PagesSummaryItemModel>(A.Fake<HttpClient>(), new Uri("https://somewhere.com")).ConfigureAwait(false);
+            var result = await apiDataProcessorService.GetAsync<ApiSummaryItemModel>(A.Fake<HttpClient>(), new Uri("https://somewhere.com")).ConfigureAwait(false);
 
             // assert
             A.CallTo(() => fakeApiService.GetAsync(A<HttpClient>.Ignored, A<Uri>.Ignored, A<string>.Ignored)).MustHaveHappenedOnceExactly();
@@ -66,7 +66,7 @@ namespace dfc_cmsapi_pkg_netcore.ApiProcessorService.UnitTests
             var apiDataProcessorService = new ApiDataProcessorService(fakeApiService);
 
             // act
-            var exceptionResult = await Assert.ThrowsAsync<ArgumentNullException>(async () => await apiDataProcessorService.GetAsync<PagesSummaryItemModel>(null, new Uri("https://somewhere.com")).ConfigureAwait(false)).ConfigureAwait(false);
+            var exceptionResult = await Assert.ThrowsAsync<ArgumentNullException>(async () => await apiDataProcessorService.GetAsync<ApiSummaryItemModel>(null, new Uri("https://somewhere.com")).ConfigureAwait(false)).ConfigureAwait(false);
 
             // assert
             A.CallTo(() => fakeApiService.GetAsync(A<HttpClient>.Ignored, A<Uri>.Ignored, A<string>.Ignored)).MustNotHaveHappened();

@@ -11,11 +11,11 @@ namespace dfc_content_pkg_netcore.contracts
             where T : class;
 
         Task<T> GetItemAsync<T>(Uri url)
-            where T : class, IPagesApiDataModel;
+            where T : class, ICmsApiDataModel;
 
-        Task<ApiContentItemModel> GetContentItemAsync(LinkDetails details);
+        Task<BaseContentItemModel> GetContentItemAsync(LinkDetails details);
 
-        Task<ApiContentItemModel> GetContentItemAsync(Uri uri);
+        Task<BaseContentItemModel> GetContentItemAsync(Uri uri);
 
         Task<List<T>> GetContentAsync<T>()
             where T : class;
