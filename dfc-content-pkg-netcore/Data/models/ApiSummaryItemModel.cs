@@ -4,20 +4,13 @@ using System;
 
 namespace dfc_content_pkg_netcore.models
 {
-    public class PagesSummaryItemModel : IApiDataModel
+    public class ApiSummaryItemModel : IApiDataModel
     {
         [JsonProperty(PropertyName = "uri")]
-        public Uri Url { get; set; }
+        public Uri? Url { get; set; }
 
         [JsonProperty(PropertyName = "skos__prefLabel")]
-        public string Title { get; set; }
-
-        public string CanonicalName
-        {
-            get => Title;
-
-            set => Title = value;
-        }
+        public string? Title { get; set; }
 
         public DateTime? CreatedDate { get; set; }
 

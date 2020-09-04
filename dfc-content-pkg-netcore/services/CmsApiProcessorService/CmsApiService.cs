@@ -39,7 +39,7 @@ namespace dfc_content_pkg_netcore.CmsApiProcessorService
                 .ConfigureAwait(false);
         }
 
-        public async Task<T> GetItemAsync<T>(Uri url) where T : class, IPagesApiDataModel
+        public async Task<T> GetItemAsync<T>(Uri url) where T : class, ICmsApiDataModel
         {
             var apiDataModel = await apiDataProcessorService.GetAsync<T>(httpClient, url)
                 .ConfigureAwait(false);
@@ -49,15 +49,15 @@ namespace dfc_content_pkg_netcore.CmsApiProcessorService
             return apiDataModel;
         }
 
-        public async Task<ApiContentItemModel> GetContentItemAsync(LinkDetails details)
+        public async Task<BaseContentItemModel> GetContentItemAsync(LinkDetails details)
         {
-            return await apiDataProcessorService.GetAsync<ApiContentItemModel>(httpClient, details.Uri)
+            return await apiDataProcessorService.GetAsync<BaseContentItemModel>(httpClient, details.Uri)
                 .ConfigureAwait(false);
         }
 
-        public async Task<ApiContentItemModel> GetContentItemAsync(Uri uri)
+        public async Task<BaseContentItemModel> GetContentItemAsync(Uri uri)
         {
-            return await apiDataProcessorService.GetAsync<ApiContentItemModel>(httpClient, uri)
+            return await apiDataProcessorService.GetAsync<BaseContentItemModel>(httpClient, uri)
                 .ConfigureAwait(false);
         }
 
@@ -84,7 +84,7 @@ namespace dfc_content_pkg_netcore.CmsApiProcessorService
             return contentList;
         }
 
-        private async Task GetSharedChildContentItems(ContentLinksModel model, IList<ApiContentItemModel> contentItem)
+        private async Task GetSharedChildContentItems(ContentLinksModel model, IList<BaseContentItemModel> contentItem)
         {
             if (model != null && model.ContentLinks.Any())
             {
