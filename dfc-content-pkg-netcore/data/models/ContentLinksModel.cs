@@ -1,17 +1,19 @@
-﻿using dfc_content_pkg_netcore.enums;
+﻿using DFC.Content.Pkg.Netcore.Data.Enums;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 
-namespace dfc_content_pkg_netcore.models
+namespace DFC.Content.Pkg.Netcore.Data.Models
 {
+    [ExcludeFromCodeCoverage]
     public class ContentLinksModel
     {
-        private readonly JObject jLinks;
+        private readonly JObject? jLinks;
 
-        public ContentLinksModel(JObject jLinks)
+        public ContentLinksModel(JObject? jLinks)
         {
             this.jLinks = jLinks;
         }
@@ -23,9 +25,11 @@ namespace dfc_content_pkg_netcore.models
             set => LinksPrivate = value;
         }
 
+        public bool ExcludePageLocation { get; set; } = false;
+
         private List<KeyValuePair<string, List<LinkDetails>>>? LinksPrivate { get; set; }
 
-        private static CuriesDetails GetContentCuriesDetails(JObject links)
+        private static CuriesDetails? GetContentCuriesDetails(JObject links)
         {
             var curies = links["curies"]?.ToString();
 
@@ -39,7 +43,7 @@ namespace dfc_content_pkg_netcore.models
             return curiesList.FirstOrDefault();
         }
 
-        private static KeyValuePair<string, List<LinkDetails>> GetLinkDetailsFromArray(JToken array, string relationshipKey, string baseHref)
+        private static KeyValuePair<string, List<LinkDetails>> GetLinkDetailsFromArray(JToken array, string relationshipKey, string? baseHref)
         {
             var links = JsonConvert.DeserializeObject<List<LinkDetails>>(array.ToString());
 
@@ -83,7 +87,8 @@ namespace dfc_content_pkg_netcore.models
 
                 Enum.TryParse(typeof(ContentRelationship), relationShipKey, true, out var type);
 
-                if (type == null)
+                if (type == null || (ContentRelationship)type == ContentRelationship.Undefined ||
+                    ((ContentRelationship)type == ContentRelationship.HasPageLocation && ExcludePageLocation))
                 {
                     continue;
                 }

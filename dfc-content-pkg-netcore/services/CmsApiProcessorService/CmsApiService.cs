@@ -1,14 +1,14 @@
 ﻿using AutoMapper;
-using dfc_content_pkg_netcore.contracts;
-using dfc_content_pkg_netcore.models;
-using dfc_content_pkg_netcore.models.clientOptions;
+using DFC.Content.Pkg.Netcore.Data.Contracts;
+using DFC.Content.Pkg.Netcore.Data.Models;
+using DFC.Content.Pkg.Netcore.Data.Models.ClientOptions;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
 
-namespace dfc_content_pkg_netcore.CmsApiProcessorService
+namespace DFC.Content.Pkg.Netcore.Services.CmsApiProcessorService
 {
     public class CmsApiService : ICmsApiService
     {
@@ -29,43 +29,50 @@ namespace dfc_content_pkg_netcore.CmsApiProcessorService
             this.mapper = mapper;
         }
 
-        public async Task<IList<T>> GetSummaryAsync<T>() where T : class
+        public async Task<IList<TApiModel>?> GetSummaryAsync<TApiModel>()
+            where TApiModel : class, IApiDataModel
         {
             var url = new Uri(
                 $"{cmsApiClientOptions.BaseAddress}{cmsApiClientOptions.SummaryEndpoint}",
                 UriKind.Absolute);
 
-            return await apiDataProcessorService.GetAsync<IList<T>>(httpClient, url)
+            return await apiDataProcessorService.GetAsync<IList<TApiModel>>(httpClient, url)
                 .ConfigureAwait(false);
         }
 
-        public async Task<T> GetItemAsync<T>(Uri url) where T : class, ICmsApiDataModel
+        public async Task<TModel?> GetItemAsync<TModel, TChild>(Uri url)
+            where TModel : class, IBaseContentItemModel<TChild>
+            where TChild : class, IBaseContentItemModel<TChild>
         {
-            var apiDataModel = await apiDataProcessorService.GetAsync<T>(httpClient, url)
+            var apiDataModel = await apiDataProcessorService.GetAsync<TModel>(httpClient, url)
                 .ConfigureAwait(false);
 
-            await GetSharedChildContentItems(apiDataModel.ContentLinks, apiDataModel.ContentItems).ConfigureAwait(false);
+            if (apiDataModel != null)
+            {
+                await GetSharedChildContentItems(apiDataModel.ContentLinks, apiDataModel.ContentItems).ConfigureAwait(false);
+            }
 
             return apiDataModel;
         }
 
-        public async Task<BaseContentItemModel> GetContentItemAsync(LinkDetails details)
+        public async Task<TChild?> GetContentItemAsync<TChild>(Uri? uri)
+             where TChild : class, IBaseContentItemModel<TChild>
         {
-            return await apiDataProcessorService.GetAsync<BaseContentItemModel>(httpClient, details.Uri)
-                .ConfigureAwait(false);
+            if (uri != null)
+            {
+                return await apiDataProcessorService.GetAsync<TChild>(httpClient, uri)
+                    .ConfigureAwait(false);
+            }
+
+            return null;
         }
 
-        public async Task<BaseContentItemModel> GetContentItemAsync(Uri uri)
+        public async Task<List<TApiModel>?> GetContentAsync<TApiModel>()
+            where TApiModel : class
         {
-            return await apiDataProcessorService.GetAsync<BaseContentItemModel>(httpClient, uri)
-                .ConfigureAwait(false);
-        }
+            var contentList = new List<TApiModel>();
 
-        public async Task<List<T>> GetContentAsync<T>() where T : class
-        {
-            var contentList = new List<T>();
-
-            var ids = cmsApiClientOptions.ContentIds.Split(",").ToList();
+            var ids = cmsApiClientOptions.ContentIds != null ? cmsApiClientOptions.ContentIds.Split(",").ToList() : new List<string>();
 
             foreach (var id in ids)
             {
@@ -73,7 +80,7 @@ namespace dfc_content_pkg_netcore.CmsApiProcessorService
                     $"{cmsApiClientOptions.BaseAddress}{cmsApiClientOptions.StaticContentEndpoint}{id}",
                     UriKind.Absolute);
 
-                var content = await apiDataProcessorService.GetAsync<T>(httpClient, url).ConfigureAwait(false);
+                var content = await apiDataProcessorService.GetAsync<TApiModel>(httpClient, url).ConfigureAwait(false);
 
                 if (content != null)
                 {
@@ -84,19 +91,32 @@ namespace dfc_content_pkg_netcore.CmsApiProcessorService
             return contentList;
         }
 
-        private async Task GetSharedChildContentItems(ContentLinksModel model, IList<BaseContentItemModel> contentItem)
+        private async Task GetSharedChildContentItems<TModel>(ContentLinksModel? model, IList<TModel> contentItem)
+            where TModel : class, IBaseContentItemModel<TModel>
         {
-            if (model != null && model.ContentLinks.Any())
-            {
-                foreach (var linkDetail in model.ContentLinks.SelectMany(contentLink => contentLink.Value))
-                {
-                    var pagesApiContentItemModel = await GetContentItemAsync(linkDetail).ConfigureAwait(false);
+            var linkDetails = model?.ContentLinks.SelectMany(contentLink => contentLink.Value);
 
-                    if (pagesApiContentItemModel != null)
+            if (linkDetails != null && linkDetails.Any())
+            {
+                foreach (var linkDetail in linkDetails)
+                {
+                    if (linkDetail.Uri != null)
                     {
-                        mapper.Map(linkDetail, pagesApiContentItemModel);
-                        await GetSharedChildContentItems(pagesApiContentItemModel.ContentLinks, pagesApiContentItemModel.ContentItems).ConfigureAwait(false);
-                        contentItem.Add(pagesApiContentItemModel);
+                        var pagesApiContentItemModel = await GetContentItemAsync<TModel>(linkDetail.Uri).ConfigureAwait(false);
+
+                        if (pagesApiContentItemModel != null)
+                        {
+                            mapper.Map(linkDetail, pagesApiContentItemModel);
+
+                            if (pagesApiContentItemModel.ContentLinks != null)
+                            {
+                                pagesApiContentItemModel.ContentLinks.ExcludePageLocation = true;
+
+                                await GetSharedChildContentItems(pagesApiContentItemModel.ContentLinks, pagesApiContentItemModel.ContentItems).ConfigureAwait(false);
+                            }
+
+                            contentItem.Add(pagesApiContentItemModel);
+                        }
                     }
                 }
             }

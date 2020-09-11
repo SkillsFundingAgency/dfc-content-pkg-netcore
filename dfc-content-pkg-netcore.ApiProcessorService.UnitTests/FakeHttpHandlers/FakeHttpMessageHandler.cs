@@ -1,9 +1,11 @@
-﻿using System.Net.Http;
+﻿using System.Diagnostics.CodeAnalysis;
+using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace dfc_cmsapi_pkg_netcore.ApiProcessorService.UnitTests.FakeHttpHandlers
+namespace DFC.Content.Pkg.Netcore.ApiProcessorService.UnitTests.FakeHttpHandlers
 {
+    [ExcludeFromCodeCoverage]
     public class FakeHttpMessageHandler : HttpMessageHandler
     {
         private readonly IFakeHttpRequestSender fakeHttpRequestSender;

@@ -3,10 +3,11 @@ using System.Collections.Generic;
 
 namespace DFC.Content.Pkg.Netcore.Data.Contracts
 {
-    public interface ICmsApiDataModel
+    public interface IBaseContentItemModel<TModel> : IApiDataModel
+        where TModel : class
     {
         ContentLinksModel? ContentLinks { get; set; }
 
-        IList<BaseContentItemModel> ContentItems { get; set; }
+        IList<TModel> ContentItems { get; set; }
     }
 }

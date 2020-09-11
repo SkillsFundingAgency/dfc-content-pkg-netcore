@@ -1,12 +1,10 @@
 ﻿using DFC.Content.Pkg.Netcore.Data.Contracts;
 using Newtonsoft.Json;
 using System;
-using System.Diagnostics.CodeAnalysis;
 
-namespace DFC.Content.Pkg.Netcore.Data.Models
+namespace DFC.Content.Pkg.Netcore.CmsApiProcessorService.UnitTests.Models
 {
-    [ExcludeFromCodeCoverage]
-    public class ApiSummaryItemModel : IApiDataModel
+    public class ApiSummaryModel : IApiDataModel
     {
         [JsonProperty(PropertyName = "uri")]
         public Uri? Url { get; set; }

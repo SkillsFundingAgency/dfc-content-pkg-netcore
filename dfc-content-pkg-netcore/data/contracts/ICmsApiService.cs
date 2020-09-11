@@ -1,23 +1,22 @@
-﻿using dfc_content_pkg_netcore.models;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace dfc_content_pkg_netcore.contracts
+namespace DFC.Content.Pkg.Netcore.Data.Contracts
 {
     public interface ICmsApiService
     {
-        Task<IList<T>> GetSummaryAsync<T>()
-            where T : class;
+        Task<IList<TApiModel>?> GetSummaryAsync<TApiModel>()
+            where TApiModel : class, IApiDataModel;
 
-        Task<T> GetItemAsync<T>(Uri url)
-            where T : class, ICmsApiDataModel;
+        Task<TModel?> GetItemAsync<TModel, TChild>(Uri url)
+            where TModel : class, IBaseContentItemModel<TChild>
+            where TChild : class, IBaseContentItemModel<TChild>;
 
-        Task<BaseContentItemModel> GetContentItemAsync(LinkDetails details);
+        Task<TChild?> GetContentItemAsync<TChild>(Uri? uri)
+            where TChild : class, IBaseContentItemModel<TChild>;
 
-        Task<BaseContentItemModel> GetContentItemAsync(Uri uri);
-
-        Task<List<T>> GetContentAsync<T>()
-            where T : class;
+        Task<List<TApiModel>?> GetContentAsync<TApiModel>()
+            where TApiModel : class;
     }
 }

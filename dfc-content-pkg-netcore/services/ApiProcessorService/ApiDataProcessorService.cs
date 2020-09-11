@@ -1,4 +1,4 @@
-﻿using dfc_content_pkg_netcore.contracts;
+﻿using DFC.Content.Pkg.Netcore.Data.Contracts;
 using Newtonsoft.Json;
 using System;
 using System.Net;
@@ -6,7 +6,7 @@ using System.Net.Http;
 using System.Net.Mime;
 using System.Threading.Tasks;
 
-namespace dfc_content_pkg_netcore.ApiProcessorService
+namespace DFC.Content.Pkg.Netcore.Services.ApiProcessorService
 {
     public class ApiDataProcessorService : IApiDataProcessorService
     {
@@ -17,7 +17,7 @@ namespace dfc_content_pkg_netcore.ApiProcessorService
             this.apiService = apiService;
         }
 
-        public async Task<TApiModel> GetAsync<TApiModel>(HttpClient? httpClient, Uri url)
+        public async Task<TApiModel?> GetAsync<TApiModel>(HttpClient? httpClient, Uri url)
             where TApiModel : class
         {
             _ = httpClient ?? throw new ArgumentNullException(nameof(httpClient));
@@ -30,6 +30,13 @@ namespace dfc_content_pkg_netcore.ApiProcessorService
             }
 
             return default;
+        }
+
+        public async Task<HttpStatusCode> PostAsync(HttpClient? httpClient, Uri url)
+        {
+            _ = httpClient ?? throw new ArgumentNullException(nameof(httpClient));
+
+            return await apiService.PostAsync(httpClient, url).ConfigureAwait(false);
         }
 
         public async Task<HttpStatusCode> PostAsync<TModel>(HttpClient? httpClient, Uri url, TModel model)

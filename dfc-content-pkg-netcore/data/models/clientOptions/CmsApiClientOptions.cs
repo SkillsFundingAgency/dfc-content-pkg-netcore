@@ -1,11 +1,14 @@
-﻿namespace dfc_content_pkg_netcore.models.clientOptions
+﻿using System.Diagnostics.CodeAnalysis;
+
+namespace DFC.Content.Pkg.Netcore.Data.Models.ClientOptions
 {
+    [ExcludeFromCodeCoverage]
     public class CmsApiClientOptions : ClientOptionsModel
     {
-        public string SummaryEndpoint { get; set; } = "content/getcontent/api/execute/page";
+        public string SummaryEndpoint { get; set; } = "/page";
 
-        public string StaticContentEndpoint { get; set; } = "content/getcontent/api/execute/sharedcontent/";
+        public string StaticContentEndpoint { get; set; } = "/sharedcontent/";
 
-        public string ContentIds { get; set; }
+        public string? ContentIds { get; set; }
     }
 }

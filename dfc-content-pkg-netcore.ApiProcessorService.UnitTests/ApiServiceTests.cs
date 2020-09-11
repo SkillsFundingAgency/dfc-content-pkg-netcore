@@ -1,5 +1,6 @@
-﻿using dfc_cmsapi_pkg_netcore.ApiProcessorService.UnitTests.FakeHttpHandlers;
-using dfc_content_pkg_netcore.ApiProcessorService;
+﻿using DFC.Content.Pkg.Netcore.ApiProcessorService.UnitTests.FakeHttpHandlers;
+using DFC.Content.Pkg.Netcore.ApiProcessorService.UnitTests.Models;
+using DFC.Content.Pkg.Netcore.Services.ApiProcessorService;
 using FakeItEasy;
 using Microsoft.Extensions.Logging;
 using System;
@@ -9,7 +10,7 @@ using System.Net.Mime;
 using System.Threading.Tasks;
 using Xunit;
 
-namespace dfc_cmsapi_pkg_netcore.ApiProcessorService.UnitTests
+namespace DFC.Content.Pkg.Netcore.ApiProcessorService.UnitTests
 {
     [Trait("Category", "CMS API Processor Service Unit Tests")]
     public class ApiServiceTests
@@ -156,7 +157,7 @@ namespace dfc_cmsapi_pkg_netcore.ApiProcessorService.UnitTests
             A.CallTo(() => fakeHttpRequestSender.Send(A<HttpRequestMessage>.Ignored)).Returns(httpResponse);
 
             // act
-            var result = await apiService.PostAsync(httpClient, url, MediaTypeNames.Application.Json).ConfigureAwait(false);
+            var result = await apiService.PostAsync(httpClient, url).ConfigureAwait(false);
 
             // assert
             A.CallTo(() => fakeHttpRequestSender.Send(A<HttpRequestMessage>.Ignored)).MustHaveHappenedOnceExactly();
@@ -182,7 +183,7 @@ namespace dfc_cmsapi_pkg_netcore.ApiProcessorService.UnitTests
             A.CallTo(() => fakeHttpRequestSender.Send(A<HttpRequestMessage>.Ignored)).Returns(httpResponse);
 
             // act
-            var result = await apiService.PostAsync(httpClient, url, MediaTypeNames.Application.Json).ConfigureAwait(false);
+            var result = await apiService.PostAsync(httpClient, url).ConfigureAwait(false);
 
             // assert
             A.CallTo(() => fakeHttpRequestSender.Send(A<HttpRequestMessage>.Ignored)).MustHaveHappenedOnceExactly();
@@ -206,7 +207,7 @@ namespace dfc_cmsapi_pkg_netcore.ApiProcessorService.UnitTests
             A.CallTo(() => fakeHttpRequestSender.Send(A<HttpRequestMessage>.Ignored)).Throws(new ArgumentException("fake exception"));
 
             // act
-            var result = await apiService.PostAsync(httpClient, url, MediaTypeNames.Application.Json).ConfigureAwait(false);
+            var result = await apiService.PostAsync(httpClient, url).ConfigureAwait(false);
 
             // assert
             A.CallTo(() => fakeHttpRequestSender.Send(A<HttpRequestMessage>.Ignored)).MustHaveHappenedOnceExactly();
@@ -220,15 +221,106 @@ namespace dfc_cmsapi_pkg_netcore.ApiProcessorService.UnitTests
         public async Task ApiServicePostReturnsExceptionForNoHttpClient()
         {
             // arrange
-            var fakeHttpRequestSender = A.Fake<IFakeHttpRequestSender>();
             var apiService = new ApiService(logger);
             var url = new Uri("https://www.somewhere.com", UriKind.Absolute);
 
             // act
-            var exceptionResult = await Assert.ThrowsAsync<ArgumentNullException>(async () => await apiService.PostAsync(null, url, MediaTypeNames.Application.Json).ConfigureAwait(false)).ConfigureAwait(false);
+            var exceptionResult = await Assert.ThrowsAsync<ArgumentNullException>(async () => await apiService.PostAsync(null, url).ConfigureAwait(false)).ConfigureAwait(false);
 
             // assert
-            A.CallTo(() => fakeHttpRequestSender.Send(A<HttpRequestMessage>.Ignored)).MustNotHaveHappened();
+            Assert.Equal("Value cannot be null. (Parameter 'httpClient')", exceptionResult.Message);
+        }
+
+        [Fact]
+        public async Task ApiServiceWithModelPostReturnsOkStatusCode()
+        {
+            // arrange
+            const HttpStatusCode expectedResult = HttpStatusCode.OK;
+            var httpResponse = new HttpResponseMessage { StatusCode = expectedResult };
+            var fakeApiItemModel = A.Fake<ApiItemModel>();
+            var fakeHttpRequestSender = A.Fake<IFakeHttpRequestSender>();
+            var fakeHttpMessageHandler = new FakeHttpMessageHandler(fakeHttpRequestSender);
+            var httpClient = new HttpClient(fakeHttpMessageHandler);
+            var apiService = new ApiService(logger);
+            var url = new Uri("https://www.somewhere.com", UriKind.Absolute);
+
+            A.CallTo(() => fakeHttpRequestSender.Send(A<HttpRequestMessage>.Ignored)).Returns(httpResponse);
+
+            // act
+            var result = await apiService.PostAsync(httpClient, url, fakeApiItemModel).ConfigureAwait(false);
+
+            // assert
+            A.CallTo(() => fakeHttpRequestSender.Send(A<HttpRequestMessage>.Ignored)).MustHaveHappenedOnceExactly();
+            Assert.Equal(expectedResult, result);
+
+            httpResponse.Dispose();
+            httpClient.Dispose();
+            fakeHttpMessageHandler.Dispose();
+        }
+
+        [Fact]
+        public async Task ApiServicePostWithModelReturnsNotFoundStatusCode()
+        {
+            // arrange
+            const HttpStatusCode expectedResult = HttpStatusCode.NotFound;
+            var httpResponse = new HttpResponseMessage { StatusCode = expectedResult };
+            var fakeApiItemModel = A.Fake<ApiItemModel>();
+            var fakeHttpRequestSender = A.Fake<IFakeHttpRequestSender>();
+            var fakeHttpMessageHandler = new FakeHttpMessageHandler(fakeHttpRequestSender);
+            var httpClient = new HttpClient(fakeHttpMessageHandler);
+            var apiService = new ApiService(logger);
+            var url = new Uri("https://www.somewhere.com", UriKind.Absolute);
+
+            A.CallTo(() => fakeHttpRequestSender.Send(A<HttpRequestMessage>.Ignored)).Returns(httpResponse);
+
+            // act
+            var result = await apiService.PostAsync(httpClient, url, fakeApiItemModel).ConfigureAwait(false);
+
+            // assert
+            A.CallTo(() => fakeHttpRequestSender.Send(A<HttpRequestMessage>.Ignored)).MustHaveHappenedOnceExactly();
+            Assert.Equal(expectedResult, result);
+
+            httpResponse.Dispose();
+            httpClient.Dispose();
+            fakeHttpMessageHandler.Dispose();
+        }
+
+        [Fact]
+        public async Task ApiServicePostWithModelReturnsExceptionResult()
+        {
+            // arrange
+            var fakeApiItemModel = A.Fake<ApiItemModel>();
+            var fakeHttpRequestSender = A.Fake<IFakeHttpRequestSender>();
+            var fakeHttpMessageHandler = new FakeHttpMessageHandler(fakeHttpRequestSender);
+            var httpClient = new HttpClient(fakeHttpMessageHandler);
+            var apiService = new ApiService(logger);
+            var url = new Uri("https://www.somewhere.com", UriKind.Absolute);
+
+            A.CallTo(() => fakeHttpRequestSender.Send(A<HttpRequestMessage>.Ignored)).Throws(new ArgumentException("fake exception"));
+
+            // act
+            var result = await apiService.PostAsync(httpClient, url, fakeApiItemModel).ConfigureAwait(false);
+
+            // assert
+            A.CallTo(() => fakeHttpRequestSender.Send(A<HttpRequestMessage>.Ignored)).MustHaveHappenedOnceExactly();
+            Assert.Equal(HttpStatusCode.BadRequest, result);
+
+            httpClient.Dispose();
+            fakeHttpMessageHandler.Dispose();
+        }
+
+        [Fact]
+        public async Task ApiServicePostWithModelReturnsExceptionForNoHttpClient()
+        {
+            // arrange
+            var fakeApiItemModel = A.Fake<ApiItemModel>();
+            var apiService = new ApiService(logger);
+            var url = new Uri("https://www.somewhere.com", UriKind.Absolute);
+
+            // act
+            var exceptionResult = await Assert.ThrowsAsync<ArgumentNullException>(async () => await apiService.PostAsync(null, url, fakeApiItemModel).ConfigureAwait(false)).ConfigureAwait(false);
+
+            // assert
             Assert.Equal("Value cannot be null. (Parameter 'httpClient')", exceptionResult.Message);
         }
 

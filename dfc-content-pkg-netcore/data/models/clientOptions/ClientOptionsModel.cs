@@ -1,7 +1,9 @@
 ﻿using System;
+using System.Diagnostics.CodeAnalysis;
 
-namespace dfc_content_pkg_netcore.models.clientOptions
+namespace DFC.Content.Pkg.Netcore.Data.Models.ClientOptions
 {
+    [ExcludeFromCodeCoverage]
     public abstract class ClientOptionsModel
     {
         public Uri? BaseAddress { get; set; }
