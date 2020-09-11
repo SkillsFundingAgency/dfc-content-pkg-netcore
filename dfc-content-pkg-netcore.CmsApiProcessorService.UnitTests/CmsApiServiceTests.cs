@@ -163,7 +163,6 @@ namespace DFC.Content.Pkg.Netcore.CmsApiProcessorService.UnitTests
             // arrange
             var expectedResult = A.Fake<ApiItemModel>();
             var cmsApiClientOptions = CmsApiClientOptions;
-            var url = new Uri($"{cmsApiClientOptions.BaseAddress}api/somecontent", UriKind.Absolute);
             cmsApiClientOptions.ContentIds = Guid.NewGuid().ToString();
 
             A.CallTo(() => fakeApiDataProcessorService.GetAsync<ApiItemModel>(A<HttpClient>.Ignored, A<Uri>.Ignored)).Returns(expectedResult);
