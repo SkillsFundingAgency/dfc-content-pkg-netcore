@@ -2,7 +2,7 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Net.Http;
 
-namespace dfc_cmsapi_pkg_netcore.ApiProcessorService.UnitTests.FakeHttpHandlers
+namespace DFC.Content.Pkg.Netcore.ApiProcessorService.UnitTests.FakeHttpHandlers
 {
     [ExcludeFromCodeCoverage]
     public class FakeHttpRequestSender : IFakeHttpRequestSender

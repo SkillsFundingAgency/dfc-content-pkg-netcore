@@ -1,4 +1,4 @@
-﻿using dfc_content_pkg_netcore.contracts;
+﻿using DFC.Content.Pkg.Netcore.Data.Contracts;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using System;
@@ -8,7 +8,7 @@ using System.Net.Mime;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace dfc_content_pkg_netcore.ApiProcessorService
+namespace DFC.Content.Pkg.Netcore.Services.ApiProcessorService
 {
     public class ApiService : IApiService
     {
@@ -56,6 +56,37 @@ namespace dfc_content_pkg_netcore.ApiProcessorService
             return default;
         }
 
+        public async Task<HttpStatusCode> PostAsync(HttpClient? httpClient, Uri url)
+        {
+            _ = httpClient ?? throw new ArgumentNullException(nameof(httpClient));
+
+            logger.LogInformation($"Posting to {url}");
+
+            HttpResponseMessage? response = null;
+            try
+            {
+                using var request = new HttpRequestMessage
+                {
+                    Method = HttpMethod.Post,
+                    RequestUri = url,
+                };
+
+                response = await httpClient.SendAsync(request).ConfigureAwait(false);
+                if (!response.IsSuccessStatusCode)
+                {
+                    var responseContent = response.Content != null ? await response.Content.ReadAsStringAsync().ConfigureAwait(false) : string.Empty;
+                    logger.LogError($"Failure status code '{response.StatusCode}' received with content '{responseContent}', for POST: {url}");
+                    response.EnsureSuccessStatusCode();
+                }
+            }
+            catch (Exception ex)
+            {
+                logger.LogError(ex, $"Error received posting '{ex.InnerException?.Message}'. Received from {url}");
+            }
+
+            return response?.StatusCode ?? HttpStatusCode.BadRequest;
+        }
+
         public async Task<HttpStatusCode> PostAsync<TModel>(HttpClient? httpClient, Uri url, TModel model)
             where TModel : class
         {
@@ -76,7 +107,7 @@ namespace dfc_content_pkg_netcore.ApiProcessorService
                 response = await httpClient.SendAsync(request).ConfigureAwait(false);
                 if (!response.IsSuccessStatusCode)
                 {
-                    var responseContent = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
+                    var responseContent = response.Content != null ? await response.Content.ReadAsStringAsync().ConfigureAwait(false) : string.Empty;
                     logger.LogError($"Failure status code '{response.StatusCode}' received with content '{responseContent}', for POST: {url}");
                     response.EnsureSuccessStatusCode();
                 }
@@ -107,7 +138,7 @@ namespace dfc_content_pkg_netcore.ApiProcessorService
                 response = await httpClient.SendAsync(request).ConfigureAwait(false);
                 if (!response.IsSuccessStatusCode)
                 {
-                    var responseContent = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
+                    var responseContent = response.Content != null ? await response.Content.ReadAsStringAsync().ConfigureAwait(false) : string.Empty;
                     logger.LogError($"Failure status code '{response.StatusCode}' received with content '{responseContent}', for DELETE: {url}");
                     response.EnsureSuccessStatusCode();
                 }

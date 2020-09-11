@@ -1,11 +1,9 @@
-﻿using Newtonsoft.Json;
-using System;
+﻿using System;
 
-namespace dfc_content_pkg_netcore.contracts
+namespace DFC.Content.Pkg.Netcore.Data.Contracts
 {
     public interface IApiDataModel
     {
-        [JsonProperty("Uri")]
         Uri? Url { get; set; }
     }
 }

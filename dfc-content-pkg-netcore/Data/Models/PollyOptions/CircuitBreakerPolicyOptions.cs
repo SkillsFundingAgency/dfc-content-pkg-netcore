@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Diagnostics.CodeAnalysis;
 
-namespace dfc_cmsapi_pkg_netcore.Data.models
+namespace DFC.Content.Pkg.Netcore.Data.Models.PollyOptions
 {
     [ExcludeFromCodeCoverage]
     public class CircuitBreakerPolicyOptions
