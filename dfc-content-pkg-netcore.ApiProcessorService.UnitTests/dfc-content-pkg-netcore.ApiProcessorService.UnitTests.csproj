@@ -8,6 +8,7 @@
 	<Nullable>enable</Nullable>
 	  <ProjectGuid>{D1558F08-5B7E-4275-A026-87F7C1AB2C9B}</ProjectGuid>
 	<AssemblyName>DFC.Content.Pkg.Netcore.ApiProcessorService.UnitTests</AssemblyName>
+	  <OutputType>Library</OutputType>
   </PropertyGroup>
 
 	<ItemGroup>

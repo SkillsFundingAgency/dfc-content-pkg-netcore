@@ -1,14 +1,15 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-    <TargetFramework>netcoreapp3.1</TargetFramework>
-    <RootNamespace>DFC.Content.Pkg.Netcore.CmsApiProcessorService.UnitTests</RootNamespace>
-	  <CodeAnalysisRuleSet>../UnitTests.CodeAnalysis.ruleset</CodeAnalysisRuleSet>
-	  <IsPackable>false</IsPackable>
-	<Nullable>enable</Nullable>
-	<AssemblyName>DFC.Content.Pkg.Netcore.CmsApiProcessorService.UnitTests</AssemblyName>
-	<ProjectGuid>{86BBB84A-DA97-4F41-BF31-F99409E577C3}</ProjectGuid>
-  </PropertyGroup>
+	<PropertyGroup>
+		<TargetFramework>netcoreapp3.1</TargetFramework>
+		<RootNamespace>DFC.Content.Pkg.Netcore.CmsApiProcessorService.UnitTests</RootNamespace>
+		<CodeAnalysisRuleSet>../UnitTests.CodeAnalysis.ruleset</CodeAnalysisRuleSet>
+		<IsPackable>false</IsPackable>
+		<Nullable>enable</Nullable>
+		<AssemblyName>DFC.Content.Pkg.Netcore.CmsApiProcessorService.UnitTests</AssemblyName>
+		<OutputType>Library</OutputType>
+		<ProjectGuid>{86BBB84A-DA97-4F41-BF31-F99409E577C3}</ProjectGuid>
+	</PropertyGroup>
 
 	<ItemGroup>
 		<AdditionalFiles Include="..\stylecop.json" Link="stylecop.json" />
