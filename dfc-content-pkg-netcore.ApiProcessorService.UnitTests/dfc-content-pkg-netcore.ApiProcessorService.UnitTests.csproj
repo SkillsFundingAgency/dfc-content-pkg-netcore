@@ -3,32 +3,33 @@
   <PropertyGroup>
     <TargetFramework>netcoreapp3.1</TargetFramework>
     <RootNamespace>DFC.Content.Pkg.Netcore.ApiProcessorService.UnitTests</RootNamespace>
-	  <CodeAnalysisRuleSet>../UnitTests.CodeAnalysis.ruleset</CodeAnalysisRuleSet>
-	  <IsPackable>false</IsPackable>
+	<CodeAnalysisRuleSet>../UnitTests.CodeAnalysis.ruleset</CodeAnalysisRuleSet>
+	<IsPackable>false</IsPackable>
 	<Nullable>enable</Nullable>
-	  <ProjectGuid>{D1558F08-5B7E-4275-A026-87F7C1AB2C9B}</ProjectGuid>
+	<ProjectGuid>{D1558F08-5B7E-4275-A026-87F7C1AB2C9B}</ProjectGuid>
 	<AssemblyName>DFC.Content.Pkg.Netcore.ApiProcessorService.UnitTests</AssemblyName>
+	<OutputType>Library</OutputType>
   </PropertyGroup>
 
-	<ItemGroup>
-		<AdditionalFiles Include="..\stylecop.json" Link="stylecop.json" />
-	</ItemGroup>
+  <ItemGroup>
+	<AdditionalFiles Include="..\stylecop.json" Link="stylecop.json" />
+  </ItemGroup>
 
-	<ItemGroup>
-    <PackageReference Include="FakeItEasy" Version="6.2.0" />
-		<PackageReference Include="Microsoft.CodeAnalysis.FxCopAnalyzers" Version="3.0.0">
-			<PrivateAssets>all</PrivateAssets>
-			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-		</PackageReference>
-		<PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="3.1.7" />
+  <ItemGroup>
+    <PackageReference Include="FakeItEasy" Version="6.2.1" />
+	<PackageReference Include="Microsoft.CodeAnalysis.FxCopAnalyzers" Version="3.3.0">
+		<PrivateAssets>all</PrivateAssets>
+		<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+	</PackageReference>
+	<PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="3.1.8" />
     <PackageReference Include="nunit" Version="3.12.0" />
-    <PackageReference Include="NUnit3TestAdapter" Version="3.15.1" />
-    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.4.0" />
-		<PackageReference Include="StyleCop.Analyzers" Version="1.1.118">
-			<PrivateAssets>all</PrivateAssets>
-			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-		</PackageReference>
-		<PackageReference Include="xunit" Version="2.4.1" />
+    <PackageReference Include="NUnit3TestAdapter" Version="3.17.0" />
+	<PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.7.1" />
+	<PackageReference Include="StyleCop.Analyzers" Version="1.1.118">
+		<PrivateAssets>all</PrivateAssets>
+		<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+	</PackageReference>
+	<PackageReference Include="xunit" Version="2.4.1" />
     <PackageReference Include="xunit.runner.visualstudio" Version="2.4.3">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>

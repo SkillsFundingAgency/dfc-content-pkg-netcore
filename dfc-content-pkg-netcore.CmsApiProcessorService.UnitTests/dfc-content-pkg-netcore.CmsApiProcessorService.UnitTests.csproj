@@ -1,26 +1,27 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-    <TargetFramework>netcoreapp3.1</TargetFramework>
-    <RootNamespace>DFC.Content.Pkg.Netcore.CmsApiProcessorService.UnitTests</RootNamespace>
-	  <CodeAnalysisRuleSet>../UnitTests.CodeAnalysis.ruleset</CodeAnalysisRuleSet>
-	  <IsPackable>false</IsPackable>
-	<Nullable>enable</Nullable>
-	<AssemblyName>DFC.Content.Pkg.Netcore.CmsApiProcessorService.UnitTests</AssemblyName>
-	<ProjectGuid>{86BBB84A-DA97-4F41-BF31-F99409E577C3}</ProjectGuid>
-  </PropertyGroup>
+	<PropertyGroup>
+		<TargetFramework>netcoreapp3.1</TargetFramework>
+		<RootNamespace>DFC.Content.Pkg.Netcore.CmsApiProcessorService.UnitTests</RootNamespace>
+		<CodeAnalysisRuleSet>../UnitTests.CodeAnalysis.ruleset</CodeAnalysisRuleSet>
+		<IsPackable>false</IsPackable>
+		<Nullable>enable</Nullable>
+		<AssemblyName>DFC.Content.Pkg.Netcore.CmsApiProcessorService.UnitTests</AssemblyName>
+		<OutputType>Library</OutputType>
+		<ProjectGuid>{86BBB84A-DA97-4F41-BF31-F99409E577C3}</ProjectGuid>
+	</PropertyGroup>
 
 	<ItemGroup>
 		<AdditionalFiles Include="..\stylecop.json" Link="stylecop.json" />
 	</ItemGroup>
 
 	<ItemGroup>
-		<PackageReference Include="FakeItEasy" Version="6.2.0" />
-		<PackageReference Include="Microsoft.CodeAnalysis.FxCopAnalyzers" Version="3.0.0">
+		<PackageReference Include="FakeItEasy" Version="6.2.1" />
+		<PackageReference Include="Microsoft.CodeAnalysis.FxCopAnalyzers" Version="3.3.0">
 			<PrivateAssets>all</PrivateAssets>
 			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
 		</PackageReference>
-		<PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.6.1" />
+		<PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.7.1" />
 		<PackageReference Include="StyleCop.Analyzers" Version="1.1.118">
 			<PrivateAssets>all</PrivateAssets>
 			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
