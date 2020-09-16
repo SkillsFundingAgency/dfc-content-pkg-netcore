@@ -26,6 +26,10 @@
         hasRequirementsPrefix,
         hasUniversityLink,
         hasUniversityRequirement,
-        hasApprenticeshipStandard
+        hasApprenticeshipStandard,
+        esco__relatedEssentialSkill,
+        esco__relatedOptionalSkill,
+        esco_skill,
+        esco__skillType
     }
 }

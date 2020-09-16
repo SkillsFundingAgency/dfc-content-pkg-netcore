@@ -90,6 +90,12 @@ namespace dfc_content_pkg_netcore.CmsApiProcessorService
             {
                 foreach (var linkDetail in model.ContentLinks.SelectMany(contentLink => contentLink.Value))
                 {
+                    if (linkDetail.ContentType.StartsWith("esco__"))
+                    {
+                        var newLink = linkDetail.Uri.ToString().Replace("esco__", "");
+                        linkDetail.Uri = new Uri(newLink);
+                    }
+
                     var pagesApiContentItemModel = await GetContentItemAsync(linkDetail).ConfigureAwait(false);
 
                     if (pagesApiContentItemModel != null)

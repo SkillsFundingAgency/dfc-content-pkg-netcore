@@ -73,40 +73,7 @@ namespace dfc_cmsapi_pkg_netcore.ApiProcessorService.UnitTests
             Assert.Equal("Value cannot be null. (Parameter 'httpClient')", exceptionResult.Message);
         }
 
-        [Fact]
-        public async Task ApiDataProcessorServicePostReturnsSuccess()
-        {
-            // arrange
-            var expectedResult = HttpStatusCode.Created;
-            var fakeEventGridSubscriptionModel = A.Fake<EventGridSubscriptionModel>();
-
-            A.CallTo(() => fakeApiService.PostAsync(A<HttpClient>.Ignored, A<Uri>.Ignored, A<EventGridSubscriptionModel>.Ignored)).Returns(expectedResult);
-
-            var apiDataProcessorService = new ApiDataProcessorService(fakeApiService);
-
-            // act
-            var result = await apiDataProcessorService.PostAsync(A.Fake<HttpClient>(), new Uri("https://somewhere.com"), fakeEventGridSubscriptionModel).ConfigureAwait(false);
-
-            // assert
-            A.CallTo(() => fakeApiService.PostAsync(A<HttpClient>.Ignored, A<Uri>.Ignored, A<EventGridSubscriptionModel>.Ignored)).MustHaveHappenedOnceExactly();
-            A.Equals(result, expectedResult);
-        }
-
-        [Fact]
-        public async Task ApiDataProcessorServicePostReturnsExceptionForNoHttpClient()
-        {
-            // arrange
-            var fakeEventGridSubscriptionModel = A.Fake<EventGridSubscriptionModel>();
-
-            var apiDataProcessorService = new ApiDataProcessorService(fakeApiService);
-
-            // act
-            var exceptionResult = await Assert.ThrowsAsync<ArgumentNullException>(async () => await apiDataProcessorService.PostAsync(null, new Uri("https://somewhere.com"), fakeEventGridSubscriptionModel).ConfigureAwait(false)).ConfigureAwait(false);
-
-            // assert
-            A.CallTo(() => fakeApiService.PostAsync(A<HttpClient>.Ignored, A<Uri>.Ignored, A<string>.Ignored)).MustNotHaveHappened();
-            Assert.Equal("Value cannot be null. (Parameter 'httpClient')", exceptionResult.Message);
-        }
+ 
 
         [Fact]
         public async Task ApiDataProcessorServiceDeleteReturnsSuccess()

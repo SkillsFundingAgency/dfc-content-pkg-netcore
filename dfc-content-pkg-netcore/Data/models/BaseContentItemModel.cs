@@ -16,6 +16,9 @@ namespace dfc_content_pkg_netcore.models
         [JsonProperty("skos__prefLabel")]
         public string Content { get; set; }
 
+        [JsonProperty("contentType")]
+        public string ContentType { get; set; }
+
         [JsonProperty(PropertyName = "ModifiedDate")]
         public DateTime Published { get; set; }
 
