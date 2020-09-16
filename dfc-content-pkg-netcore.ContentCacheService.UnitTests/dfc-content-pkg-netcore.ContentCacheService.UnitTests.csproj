@@ -3,8 +3,12 @@
   <PropertyGroup>
     <TargetFramework>netcoreapp3.1</TargetFramework>
     <RootNamespace>dfc_content_pkg_netcore.ContentCacheService.UnitTests</RootNamespace>
-
+    <CodeAnalysisRuleSet>../UnitTests.CodeAnalysis.ruleset</CodeAnalysisRuleSet>
     <IsPackable>false</IsPackable>
+    <Nullable>enable</Nullable>
+    <ProjectGuid>{69263512-BD12-4B7D-A72D-41966CAAA10A}</ProjectGuid>
+    <AssemblyName>DFC.Content.Pkg.Netcore.ApiProcessorService.UnitTests</AssemblyName>
+    <OutputType>Library</OutputType>>
   </PropertyGroup>
 
   <ItemGroup>
