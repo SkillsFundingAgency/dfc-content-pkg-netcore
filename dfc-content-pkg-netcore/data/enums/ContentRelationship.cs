@@ -33,5 +33,9 @@
         HasSharedContent,
         HasPageLocation,
         HasPageLocationParent,
+        esco__relatedEssentialSkill,
+        esco__relatedOptionalSkill,
+        esco_skill,
+        esco__skillType
     }
 }
