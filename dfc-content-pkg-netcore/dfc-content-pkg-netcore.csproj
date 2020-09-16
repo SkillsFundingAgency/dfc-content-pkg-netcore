@@ -4,7 +4,7 @@
     <TargetFramework>netstandard2.1</TargetFramework>
     <RootNamespace>DFC.Content.Pkg.Netcore</RootNamespace>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <Version>1.1.0</Version>
+    <Version>1.2.0</Version>
 	<Nullable>enable</Nullable>
 	<AssemblyName>DFC.Content.Pkg.Netcore</AssemblyName>
 	<OutputType>Library</OutputType>
