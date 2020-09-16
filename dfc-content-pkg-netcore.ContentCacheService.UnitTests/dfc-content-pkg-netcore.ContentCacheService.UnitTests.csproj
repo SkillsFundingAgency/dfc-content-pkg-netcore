@@ -6,9 +6,9 @@
     <CodeAnalysisRuleSet>../UnitTests.CodeAnalysis.ruleset</CodeAnalysisRuleSet>
     <IsPackable>false</IsPackable>
     <Nullable>enable</Nullable>
-    <ProjectGuid>{69263512-BD12-4B7D-A72D-41966CAAA10A}</ProjectGuid>
-    <AssemblyName>DFC.Content.Pkg.Netcore.ApiProcessorService.UnitTests</AssemblyName>
-    <OutputType>Library</OutputType>>
+    <ProjectGuid>{4E1AE4AF-CA9E-4D18-A876-F4FBCBA76EC5}</ProjectGuid>
+    <AssemblyName>DFC.Content.Pkg.Netcore.ContentCacheService.UnitTests</AssemblyName>
+    <OutputType>Library</OutputType>
   </PropertyGroup>
 
   <ItemGroup>
