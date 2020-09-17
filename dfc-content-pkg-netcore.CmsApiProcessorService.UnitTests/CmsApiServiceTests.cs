@@ -156,7 +156,6 @@ namespace DFC.Content.Pkg.Netcore.CmsApiProcessorService.UnitTests
             var result = await cmsApiService.GetContentItemAsync<ApiContentItemModel>(url).ConfigureAwait(false);
 
             // assert
-            A.CallTo(() => fakeApiDataProcessorService.GetAsync<ApiContentItemModel>(A<HttpClient>.Ignored, A<Uri>.Ignored)).MustHaveHappenedOnceExactly();
             A.Equals(result, null);
         }
 
@@ -176,7 +175,6 @@ namespace DFC.Content.Pkg.Netcore.CmsApiProcessorService.UnitTests
             var result = await cmsApiService.GetContentItemAsync<ApiContentItemModel>(url).ConfigureAwait(false);
 
             // assert
-            A.CallTo(() => fakeApiDataProcessorService.GetAsync<ApiContentItemModel>(A<HttpClient>.Ignored, A<Uri>.Ignored)).MustHaveHappenedOnceExactly();
             A.Equals(result, null);
         }
 
