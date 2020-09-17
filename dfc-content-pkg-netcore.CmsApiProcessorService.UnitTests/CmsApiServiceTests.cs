@@ -142,6 +142,45 @@ namespace DFC.Content.Pkg.Netcore.CmsApiProcessorService.UnitTests
         }
 
         [Fact]
+        public async Task CmsApiServiceGetContentItemReturnsNullWhenSkillsPassed()
+        {
+            // arrange
+            var expectedResult = A.Fake<ApiContentItemModel>();
+            var url = new Uri($"{CmsApiClientOptions.BaseAddress}api//skills", UriKind.Absolute);
+
+            A.CallTo(() => fakeApiDataProcessorService.GetAsync<ApiContentItemModel>(A<HttpClient>.Ignored, A<Uri>.Ignored)).Returns(expectedResult);
+
+            var cmsApiService = new CmsApiService(CmsApiClientOptions, fakeApiDataProcessorService, fakeHttpClient, mapper);
+
+            // act
+            var result = await cmsApiService.GetContentItemAsync<ApiContentItemModel>(url).ConfigureAwait(false);
+
+            // assert
+            A.CallTo(() => fakeApiDataProcessorService.GetAsync<ApiContentItemModel>(A<HttpClient>.Ignored, A<Uri>.Ignored)).MustHaveHappenedOnceExactly();
+            A.Equals(result, null);
+        }
+
+
+        [Fact]
+        public async Task CmsApiServiceGetContentItemReturnsNullWhenKnowledgePassed()
+        {
+            // arrange
+            var expectedResult = A.Fake<ApiContentItemModel>();
+            var url = new Uri($"{CmsApiClientOptions.BaseAddress}api//knowledge", UriKind.Absolute);
+
+            A.CallTo(() => fakeApiDataProcessorService.GetAsync<ApiContentItemModel>(A<HttpClient>.Ignored, A<Uri>.Ignored)).Returns(expectedResult);
+
+            var cmsApiService = new CmsApiService(CmsApiClientOptions, fakeApiDataProcessorService, fakeHttpClient, mapper);
+
+            // act
+            var result = await cmsApiService.GetContentItemAsync<ApiContentItemModel>(url).ConfigureAwait(false);
+
+            // assert
+            A.CallTo(() => fakeApiDataProcessorService.GetAsync<ApiContentItemModel>(A<HttpClient>.Ignored, A<Uri>.Ignored)).MustHaveHappenedOnceExactly();
+            A.Equals(result, null);
+        }
+
+        [Fact]
         public async Task CmsApiServiceGetContentItemReturnsNull()
         {
             // arrange
