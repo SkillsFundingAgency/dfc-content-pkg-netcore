@@ -3,9 +3,8 @@
   <PropertyGroup>
     <TargetFramework>netcoreapp3.1</TargetFramework>
     <RootNamespace>DFC.Content.Pkg.Netcore.UnitTests</RootNamespace>
-
+    <ProjectGuid>{D8190869-2BE7-479C-8DB4-44F21FAB444FA}</ProjectGuid>
     <IsPackable>false</IsPackable>
-
     <AssemblyName>DFC.Content.Pkg.Netcore.UnitTests</AssemblyName>
   </PropertyGroup>
 
