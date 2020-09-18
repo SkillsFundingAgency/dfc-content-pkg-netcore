@@ -50,8 +50,6 @@ namespace DFC.Content.Pkg.Netcore.Services.CmsApiProcessorService
             var apiDataModel = await apiDataProcessorService.GetAsync<TModel>(httpClient, url)
                 .ConfigureAwait(false);
 
-            apiCacheService.AddOrUpdate(apiDataModel.Url!, apiDataModel);
-
             if (apiDataModel != null)
             {
                 await GetSharedChildContentItems(apiDataModel.ContentLinks, apiDataModel.ContentItems).ConfigureAwait(false);
