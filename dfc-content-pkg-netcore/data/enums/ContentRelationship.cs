@@ -33,5 +33,8 @@
         HasSharedContent,
         HasPageLocation,
         HasPageLocationParent,
+        HasPersonalityShortQuestion,
+        HasPersonalityTrait,
+        HasJobCategory
     }
 }

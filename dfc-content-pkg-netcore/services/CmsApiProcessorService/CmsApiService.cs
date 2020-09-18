@@ -16,17 +16,20 @@ namespace DFC.Content.Pkg.Netcore.Services.CmsApiProcessorService
         private readonly IApiDataProcessorService apiDataProcessorService;
         private readonly HttpClient httpClient;
         private readonly AutoMapper.IMapper mapper;
+        private readonly IApiCacheService apiCacheService;
 
         public CmsApiService(
             CmsApiClientOptions cmsApiClientOptions,
             IApiDataProcessorService apiDataProcessorService,
             HttpClient httpClient,
-            IMapper mapper)
+            IMapper mapper,
+            IApiCacheService apiCacheService)
         {
             this.cmsApiClientOptions = cmsApiClientOptions;
             this.apiDataProcessorService = apiDataProcessorService;
             this.httpClient = httpClient;
             this.mapper = mapper;
+            this.apiCacheService = apiCacheService;
         }
 
         public async Task<IList<TApiModel>?> GetSummaryAsync<TApiModel>()
@@ -47,10 +50,14 @@ namespace DFC.Content.Pkg.Netcore.Services.CmsApiProcessorService
             var apiDataModel = await apiDataProcessorService.GetAsync<TModel>(httpClient, url)
                 .ConfigureAwait(false);
 
+            apiCacheService.AddOrUpdate(apiDataModel.Url!, apiDataModel);
+
             if (apiDataModel != null)
             {
                 await GetSharedChildContentItems(apiDataModel.ContentLinks, apiDataModel.ContentItems).ConfigureAwait(false);
             }
+
+            apiCacheService.Clear();
 
             return apiDataModel;
         }
@@ -102,7 +109,7 @@ namespace DFC.Content.Pkg.Netcore.Services.CmsApiProcessorService
                 {
                     if (linkDetail.Uri != null)
                     {
-                        var pagesApiContentItemModel = await GetContentItemAsync<TModel>(linkDetail.Uri).ConfigureAwait(false);
+                        var pagesApiContentItemModel = GetFromApiCache<TModel>(linkDetail.Uri) ?? AddToApiCache(await GetContentItemAsync<TModel>(linkDetail!.Uri!).ConfigureAwait(false));
 
                         if (pagesApiContentItemModel != null)
                         {
@@ -110,8 +117,6 @@ namespace DFC.Content.Pkg.Netcore.Services.CmsApiProcessorService
 
                             if (pagesApiContentItemModel.ContentLinks != null)
                             {
-                                pagesApiContentItemModel.ContentLinks.ExcludePageLocation = true;
-
                                 await GetSharedChildContentItems(pagesApiContentItemModel.ContentLinks, pagesApiContentItemModel.ContentItems).ConfigureAwait(false);
                             }
 
@@ -120,6 +125,24 @@ namespace DFC.Content.Pkg.Netcore.Services.CmsApiProcessorService
                     }
                 }
             }
+        }
+
+        private TModel? AddToApiCache<TModel>(TModel? model)
+            where TModel : class, IBaseContentItemModel<TModel>
+        {
+            if(model == null)
+            {
+                return null;
+            }
+
+            apiCacheService.AddOrUpdate(model!.Url!, model);
+            return model;
+        }
+
+        private TModel? GetFromApiCache<TModel>(Uri uri)
+            where TModel : class, IBaseContentItemModel<TModel>
+        {
+            return apiCacheService.Retrieve<TModel>(uri);
         }
     }
 }
