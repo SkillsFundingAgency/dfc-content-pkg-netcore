@@ -123,7 +123,7 @@ namespace DFC.Content.Pkg.Netcore.CmsApiProcessorService.UnitTests
                 expectedItemResult.ContentLinks.ContentLinks.SelectMany(contentLink => contentLink.Value).Count();
 
             A.CallTo(() => fakeApiDataProcessorService.GetAsync<ApiItemModel>(A<HttpClient>.Ignored, A<Uri>.Ignored)).MustHaveHappenedOnceExactly();
-            //Account for cache hit on child item
+            // Account for cache hit on child item
             A.CallTo(() => fakeApiDataProcessorService.GetAsync<ApiContentItemModel>(A<HttpClient>.Ignored, A<Uri>.Ignored)).MustHaveHappened(expectedCount - 1, Times.Exactly);
             A.Equals(result, expectedResult);
         }
