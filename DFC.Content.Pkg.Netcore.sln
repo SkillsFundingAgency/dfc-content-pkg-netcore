@@ -23,7 +23,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "_Solution Items", "_Solutio
 		UnitTests.CodeAnalysis.ruleset = UnitTests.CodeAnalysis.ruleset
 	EndProjectSection
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "dfc-content-pkg-netcore.ContentCacheService.UnitTests", "dfc-content-pkg-netcore.ContentCacheService.UnitTests\dfc-content-pkg-netcore.ContentCacheService.UnitTests.csproj", "{4E1AE4AF-CA9E-4D18-A876-F4FBCBA76EC5}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "dfc-content-pkg-netcore-unitTests", "dfc-content-pkg-netcore-unitTests\dfc-content-pkg-netcore-unitTests.csproj", "{9F73BF47-B6EF-4F40-9A51-F026B21A91CF}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -47,6 +47,10 @@ Global
 		{4E1AE4AF-CA9E-4D18-A876-F4FBCBA76EC5}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4E1AE4AF-CA9E-4D18-A876-F4FBCBA76EC5}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{4E1AE4AF-CA9E-4D18-A876-F4FBCBA76EC5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9F73BF47-B6EF-4F40-9A51-F026B21A91CF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9F73BF47-B6EF-4F40-9A51-F026B21A91CF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9F73BF47-B6EF-4F40-9A51-F026B21A91CF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9F73BF47-B6EF-4F40-9A51-F026B21A91CF}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -55,6 +59,7 @@ Global
 		{D1558F08-5B7E-4275-A026-87F7C1AB2C9B} = {FAFC8842-BDA5-4079-ACC5-A1A0C97D3E2C}
 		{86BBB84A-DA97-4F41-BF31-F99409E577C3} = {FAFC8842-BDA5-4079-ACC5-A1A0C97D3E2C}
 		{4E1AE4AF-CA9E-4D18-A876-F4FBCBA76EC5} = {FAFC8842-BDA5-4079-ACC5-A1A0C97D3E2C}
+		{9F73BF47-B6EF-4F40-9A51-F026B21A91CF} = {FAFC8842-BDA5-4079-ACC5-A1A0C97D3E2C}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {B8269F43-233B-4290-8BD0-DF76C16DC579}
