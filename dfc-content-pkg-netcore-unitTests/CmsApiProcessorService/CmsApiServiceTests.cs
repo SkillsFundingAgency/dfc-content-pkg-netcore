@@ -66,6 +66,24 @@ namespace DFC.Content.Pkg.Netcore.CmsApiProcessorService.UnitTests
         }
 
         [Fact]
+        public async Task CmsApiServiceGetItemNoChildrenReturnsSuccess()
+        {
+            // arrange
+            var expectedResult = A.Fake<ApiItemNoChildrenModel>();
+
+            A.CallTo(() => fakeApiDataProcessorService.GetAsync<ApiItemNoChildrenModel>(A<HttpClient>.Ignored, A<Uri>.Ignored)).Returns(expectedResult);
+
+            var cmsApiService = new CmsApiService(CmsApiClientOptions, fakeApiDataProcessorService, fakeHttpClient, mapper, new ApiCacheService());
+
+            // act
+            var result = await cmsApiService.GetItemAsync<ApiItemNoChildrenModel>("root-item-only", Guid.NewGuid()).ConfigureAwait(false);
+
+            // assert
+            A.CallTo(() => fakeApiDataProcessorService.GetAsync<ApiItemNoChildrenModel>(A<HttpClient>.Ignored, A<Uri>.Ignored)).MustHaveHappenedOnceExactly();
+            A.Equals(result, expectedResult);
+        }
+
+        [Fact]
         public async Task CmsApiServiceGetItemReturnsSuccess()
         {
             // arrange
