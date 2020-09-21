@@ -60,6 +60,12 @@ namespace DFC.Content.Pkg.Netcore.Services.CmsApiProcessorService
             return await apiDataProcessorService.GetAsync<TModel>(httpClient, uri).ConfigureAwait(false);
         }
 
+        public async Task<TModel?> GetItemAsync<TModel>(Uri url)
+           where TModel : class, IApiDataModel
+        {
+            return await apiDataProcessorService.GetAsync<TModel>(httpClient, url).ConfigureAwait(false);
+        }
+
         public async Task<TModel?> GetItemAsync<TModel, TChild>(Uri url)
             where TModel : class, IBaseContentItemModel<TChild>
             where TChild : class, IBaseContentItemModel<TChild>
