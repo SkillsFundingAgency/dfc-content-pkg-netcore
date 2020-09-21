@@ -15,6 +15,9 @@ namespace DFC.Content.Pkg.Netcore.Data.Contracts
         Task<TModel?> GetItemAsync<TModel>(string contentType, Guid id)
            where TModel : class, IApiDataModel;
 
+        Task<TModel?> GetItemAsync<TModel>(Uri url)
+           where TModel : class, IApiDataModel;
+
         Task<TModel?> GetItemAsync<TModel, TChild>(Uri url)
             where TModel : class, IBaseContentItemModel<TChild>
             where TChild : class, IBaseContentItemModel<TChild>;
