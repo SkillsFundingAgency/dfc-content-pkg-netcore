@@ -1,4 +1,4 @@
-﻿using DFC.Content.Pkg.Netcore.Data.enums;
+﻿using DFC.Content.Pkg.Netcore.Data.Enums;
 using System;
 using System.Collections.Generic;
 

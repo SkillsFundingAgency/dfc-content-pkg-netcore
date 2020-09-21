@@ -6,8 +6,11 @@ namespace DFC.Content.Pkg.Netcore.Data.Contracts
 {
     public interface ICmsApiService
     {
-        Task<IList<TApiModel>?> GetSummaryAsync<TApiModel>()
+        Task<IList<TApiModel>?> GetSummaryAsync<TApiModel>(string contentType)
             where TApiModel : class, IApiDataModel;
+
+        Task<IList<TApiModel>?> GetSummaryAsync<TApiModel>()
+         where TApiModel : class, IApiDataModel;
 
         Task<TModel?> GetItemAsync<TModel, TChild>(Uri url)
             where TModel : class, IBaseContentItemModel<TChild>
