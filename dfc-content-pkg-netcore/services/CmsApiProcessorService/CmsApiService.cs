@@ -32,15 +32,24 @@ namespace DFC.Content.Pkg.Netcore.Services.CmsApiProcessorService
             this.apiCacheService = apiCacheService;
         }
 
+        public async Task<IList<TApiModel>?> GetSummaryAsync<TApiModel>(string contentType)
+          where TApiModel : class, IApiDataModel
+        {
+            var url = new Uri(
+                     $"{cmsApiClientOptions.BaseAddress}{cmsApiClientOptions.SummaryEndpoint}{contentType}",
+                     UriKind.Absolute);
+
+            return await GetSummaryAsync<TApiModel>(url).ConfigureAwait(false);
+        }
+
         public async Task<IList<TApiModel>?> GetSummaryAsync<TApiModel>()
             where TApiModel : class, IApiDataModel
         {
             var url = new Uri(
-                $"{cmsApiClientOptions.BaseAddress}{cmsApiClientOptions.SummaryEndpoint}",
-                UriKind.Absolute);
+                  $"{cmsApiClientOptions.BaseAddress}{cmsApiClientOptions.SummaryEndpoint}",
+                  UriKind.Absolute);
 
-            return await apiDataProcessorService.GetAsync<IList<TApiModel>>(httpClient, url)
-                .ConfigureAwait(false);
+            return await GetSummaryAsync<TApiModel>(url).ConfigureAwait(false);
         }
 
         public async Task<TModel?> GetItemAsync<TModel, TChild>(Uri url)
@@ -54,8 +63,6 @@ namespace DFC.Content.Pkg.Netcore.Services.CmsApiProcessorService
             {
                 await GetSharedChildContentItems(apiDataModel.ContentLinks, apiDataModel.ContentItems).ConfigureAwait(false);
             }
-
-            apiCacheService.Clear();
 
             return apiDataModel;
         }
@@ -125,10 +132,21 @@ namespace DFC.Content.Pkg.Netcore.Services.CmsApiProcessorService
             }
         }
 
+        private async Task<IList<TApiModel>?> GetSummaryAsync<TApiModel>(Uri url)
+          where TApiModel : class, IApiDataModel
+        {
+            var result = await apiDataProcessorService.GetAsync<IList<TApiModel>>(httpClient, url)
+              .ConfigureAwait(false);
+
+            apiCacheService.Clear();
+
+            return result;
+        }
+
         private TModel? AddToApiCache<TModel>(TModel? model)
             where TModel : class, IBaseContentItemModel<TModel>
         {
-            if(model == null)
+            if (model == null)
             {
                 return null;
             }

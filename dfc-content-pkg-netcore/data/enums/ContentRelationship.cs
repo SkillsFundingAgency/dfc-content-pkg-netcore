@@ -35,6 +35,6 @@
         HasPageLocationParent,
         HasPersonalityShortQuestion,
         HasPersonalityTrait,
-        HasJobCategory
+        HasJobCategory,
     }
 }

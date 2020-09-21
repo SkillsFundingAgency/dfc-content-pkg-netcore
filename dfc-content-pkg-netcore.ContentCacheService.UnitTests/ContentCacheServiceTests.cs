@@ -1,4 +1,4 @@
-﻿using DFC.Content.Pkg.Netcore.Data.enums;
+﻿using DFC.Content.Pkg.Netcore.Data.Enums;
 using DFC.Content.Pkg.Netcore.Services;
 using FakeItEasy;
 using Microsoft.Extensions.Logging;
