@@ -52,6 +52,14 @@ namespace DFC.Content.Pkg.Netcore.Services.CmsApiProcessorService
             return await GetSummaryAsync<TApiModel>(url).ConfigureAwait(false);
         }
 
+        public async Task<TModel?> GetItemAsync<TModel>(string contentType, Guid id)
+           where TModel : class, IApiDataModel
+        {
+            var uri = new Uri($"{cmsApiClientOptions.BaseAddress}{contentType}/{id}", UriKind.Absolute);
+
+            return await apiDataProcessorService.GetAsync<TModel>(httpClient, uri).ConfigureAwait(false);
+        }
+
         public async Task<TModel?> GetItemAsync<TModel, TChild>(Uri url)
             where TModel : class, IBaseContentItemModel<TChild>
             where TChild : class, IBaseContentItemModel<TChild>
