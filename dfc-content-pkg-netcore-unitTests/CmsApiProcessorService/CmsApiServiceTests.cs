@@ -110,7 +110,7 @@ namespace DFC.Content.Pkg.Netcore.CmsApiProcessorService.UnitTests
             var expectedItemResult = A.Fake<ApiContentItemModel>();
             expectedItemResult.Url = new Uri("http://www.testChild.com");
 
-            var url = new Uri($"{CmsApiClientOptions.BaseAddress}api/someitem", UriKind.Absolute);
+            var url = new Uri($"{CmsApiClientOptions.BaseAddress}api/someitem/", UriKind.Absolute);
             expectedResult.Url = url;
             var contentUrl = new Uri("http://www.test.com");
 
@@ -218,6 +218,47 @@ namespace DFC.Content.Pkg.Netcore.CmsApiProcessorService.UnitTests
             // assert
             A.CallTo(() => fakeApiDataProcessorService.GetAsync<ApiItemModel>(A<HttpClient>.Ignored, A<Uri>.Ignored)).MustHaveHappenedOnceExactly();
             A.Equals(result, expectedResult);
+        }
+
+        [Fact]
+        public async Task CmsApiServiceGetContentItemReturnsNullWhenSkillsPassed()
+        {
+            // arrange
+            var expectedResult = A.Fake<ApiContentItemModel>();
+            var cmsApiClientOptions = CmsApiClientOptions;
+            cmsApiClientOptions.ContentIds = Guid.NewGuid().ToString();
+            var url = new Uri($"{CmsApiClientOptions.BaseAddress}api//skills", UriKind.Absolute);
+
+            A.CallTo(() => fakeApiDataProcessorService.GetAsync<ApiContentItemModel>(A<HttpClient>.Ignored, A<Uri>.Ignored)).Returns(expectedResult);
+
+            var cmsApiService = new CmsApiService(cmsApiClientOptions, fakeApiDataProcessorService, fakeHttpClient, mapper, A.Fake<IApiCacheService>());
+
+            // act
+            var result = await cmsApiService.GetContentItemAsync<ApiContentItemModel>(url).ConfigureAwait(false);
+
+            // assert
+            A.Equals(result, null);
+        }
+
+
+        [Fact]
+        public async Task CmsApiServiceGetContentItemReturnsNullWhenKnowledgePassed()
+        {
+            // arrange
+            var expectedResult = A.Fake<ApiContentItemModel>();
+            var cmsApiClientOptions = CmsApiClientOptions;
+            cmsApiClientOptions.ContentIds = Guid.NewGuid().ToString();
+            var url = new Uri($"{CmsApiClientOptions.BaseAddress}api//knowledge", UriKind.Absolute);
+
+            A.CallTo(() => fakeApiDataProcessorService.GetAsync<ApiContentItemModel>(A<HttpClient>.Ignored, A<Uri>.Ignored)).Returns(expectedResult);
+
+            var cmsApiService = new CmsApiService(cmsApiClientOptions, fakeApiDataProcessorService, fakeHttpClient, mapper, A.Fake<IApiCacheService>());
+
+            // act
+            var result = await cmsApiService.GetContentItemAsync<ApiContentItemModel>(url).ConfigureAwait(false);
+
+            // assert
+            A.Equals(result, null);
         }
     }
 }

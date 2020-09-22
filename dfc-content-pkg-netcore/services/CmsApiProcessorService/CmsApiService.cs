@@ -86,6 +86,10 @@ namespace DFC.Content.Pkg.Netcore.Services.CmsApiProcessorService
         {
             if (uri != null)
             {
+                if (uri.ToString().Contains(@"//skill") || uri.ToString().Contains(@"//knowledge")) {
+                    return null;
+                }
+
                 return await apiDataProcessorService.GetAsync<TChild>(httpClient, uri)
                     .ConfigureAwait(false);
             }
@@ -126,6 +130,12 @@ namespace DFC.Content.Pkg.Netcore.Services.CmsApiProcessorService
             {
                 foreach (var linkDetail in linkDetails)
                 {
+                    if (linkDetail.ContentType != null && linkDetail.ContentType.StartsWith("esco__"))
+                    {
+                        var newLink = linkDetail.Uri.ToString().Replace("esco__", "");
+                        linkDetail.Uri = new Uri(newLink);
+                    }
+
                     if (linkDetail.Uri != null)
                     {
                         var pagesApiContentItemModel = GetFromApiCache<TModel>(linkDetail.Uri) ?? AddToApiCache(await GetContentItemAsync<TModel>(linkDetail!.Uri!).ConfigureAwait(false));
