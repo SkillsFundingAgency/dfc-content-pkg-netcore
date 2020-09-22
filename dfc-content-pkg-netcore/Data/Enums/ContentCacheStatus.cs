@@ -4,7 +4,7 @@
     {
         NotFound = 0,
         Content = 1,
-        ContentItem = 1,
+        ContentItem = 2,
         Both = Content | ContentItem,
     }
 }
