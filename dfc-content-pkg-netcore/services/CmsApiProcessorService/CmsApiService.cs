@@ -130,7 +130,7 @@ namespace DFC.Content.Pkg.Netcore.Services.CmsApiProcessorService
             {
                 foreach (var linkDetail in linkDetails)
                 {
-                    if (linkDetail.ContentType.StartsWith("esco__"))
+                    if (linkDetail.ContentType != null && linkDetail.ContentType.StartsWith("esco__"))
                     {
                         var newLink = linkDetail.Uri.ToString().Replace("esco__", "");
                         linkDetail.Uri = new Uri(newLink);
