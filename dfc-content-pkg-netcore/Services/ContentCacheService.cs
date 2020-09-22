@@ -1,5 +1,5 @@
 ﻿using DFC.Content.Pkg.Netcore.Data.Contracts;
-using DFC.Content.Pkg.Netcore.Data.enums;
+using DFC.Content.Pkg.Netcore.Data.Enums;
 using Microsoft.Extensions.Logging;
 using NHibernate.Util;
 using System;

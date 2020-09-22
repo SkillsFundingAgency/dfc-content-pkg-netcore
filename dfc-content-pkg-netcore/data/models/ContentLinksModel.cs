@@ -25,7 +25,7 @@ namespace DFC.Content.Pkg.Netcore.Data.Models
             set => LinksPrivate = value;
         }
 
-        public bool ExcludePageLocation { get; set; } = false;
+        public bool ExcludePageLocation { get; set; }
 
         private List<KeyValuePair<string, List<LinkDetails>>>? LinksPrivate { get; set; }
 

@@ -36,6 +36,9 @@
         esco__relatedEssentialSkill,
         esco__relatedOptionalSkill,
         esco_skill,
-        esco__skillType
+        esco__skillType,
+        HasPersonalityShortQuestion,
+        HasPersonalityTrait,
+        HasJobCategory
     }
 }

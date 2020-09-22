@@ -1,11 +1,12 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>netcoreapp3.1</TargetFramework>
     <RootNamespace>DFC.Content.Pkg.Netcore.UnitTests</RootNamespace>
-    <ProjectGuid>{D8190869-2BE7-479C-8DB4-44F21FAB444FA}</ProjectGuid>
+    <ProjectGuid>{9F73BF47-B6EF-4F40-9A51-F026B21A91CF}</ProjectGuid>
     <IsPackable>false</IsPackable>
     <AssemblyName>DFC.Content.Pkg.Netcore.UnitTests</AssemblyName>
+	<Nullable>enable</Nullable>
   </PropertyGroup>
 
   <ItemGroup>

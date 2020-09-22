@@ -16,28 +16,54 @@ namespace DFC.Content.Pkg.Netcore.Services.CmsApiProcessorService
         private readonly IApiDataProcessorService apiDataProcessorService;
         private readonly HttpClient httpClient;
         private readonly AutoMapper.IMapper mapper;
+        private readonly IApiCacheService apiCacheService;
 
         public CmsApiService(
             CmsApiClientOptions cmsApiClientOptions,
             IApiDataProcessorService apiDataProcessorService,
             HttpClient httpClient,
-            IMapper mapper)
+            IMapper mapper,
+            IApiCacheService apiCacheService)
         {
             this.cmsApiClientOptions = cmsApiClientOptions;
             this.apiDataProcessorService = apiDataProcessorService;
             this.httpClient = httpClient;
             this.mapper = mapper;
+            this.apiCacheService = apiCacheService;
+        }
+
+        public async Task<IList<TApiModel>?> GetSummaryAsync<TApiModel>(string contentType)
+          where TApiModel : class, IApiDataModel
+        {
+            var url = new Uri(
+                     $"{cmsApiClientOptions.BaseAddress}{cmsApiClientOptions.SummaryEndpoint}{contentType}",
+                     UriKind.Absolute);
+
+            return await GetSummaryAsync<TApiModel>(url).ConfigureAwait(false);
         }
 
         public async Task<IList<TApiModel>?> GetSummaryAsync<TApiModel>()
             where TApiModel : class, IApiDataModel
         {
             var url = new Uri(
-                $"{cmsApiClientOptions.BaseAddress}{cmsApiClientOptions.SummaryEndpoint}",
-                UriKind.Absolute);
+                  $"{cmsApiClientOptions.BaseAddress}{cmsApiClientOptions.SummaryEndpoint}",
+                  UriKind.Absolute);
 
-            return await apiDataProcessorService.GetAsync<IList<TApiModel>>(httpClient, url)
-                .ConfigureAwait(false);
+            return await GetSummaryAsync<TApiModel>(url).ConfigureAwait(false);
+        }
+
+        public async Task<TModel?> GetItemAsync<TModel>(string contentType, Guid id)
+           where TModel : class, IApiDataModel
+        {
+            var uri = new Uri($"{cmsApiClientOptions.BaseAddress}/{contentType}/{id}", UriKind.Absolute);
+
+            return await apiDataProcessorService.GetAsync<TModel>(httpClient, uri).ConfigureAwait(false);
+        }
+
+        public async Task<TModel?> GetItemAsync<TModel>(Uri url)
+           where TModel : class, IApiDataModel
+        {
+            return await apiDataProcessorService.GetAsync<TModel>(httpClient, url).ConfigureAwait(false);
         }
 
         public async Task<TModel?> GetItemAsync<TModel, TChild>(Uri url)
@@ -112,7 +138,7 @@ namespace DFC.Content.Pkg.Netcore.Services.CmsApiProcessorService
 
                     if (linkDetail.Uri != null)
                     {
-                        var pagesApiContentItemModel = await GetContentItemAsync<TModel>(linkDetail.Uri).ConfigureAwait(false);
+                        var pagesApiContentItemModel = GetFromApiCache<TModel>(linkDetail.Uri) ?? AddToApiCache(await GetContentItemAsync<TModel>(linkDetail!.Uri!).ConfigureAwait(false));
 
                         if (pagesApiContentItemModel != null)
                         {
@@ -120,8 +146,6 @@ namespace DFC.Content.Pkg.Netcore.Services.CmsApiProcessorService
 
                             if (pagesApiContentItemModel.ContentLinks != null)
                             {
-                                pagesApiContentItemModel.ContentLinks.ExcludePageLocation = true;
-
                                 await GetSharedChildContentItems(pagesApiContentItemModel.ContentLinks, pagesApiContentItemModel.ContentItems).ConfigureAwait(false);
                             }
 
@@ -130,6 +154,35 @@ namespace DFC.Content.Pkg.Netcore.Services.CmsApiProcessorService
                     }
                 }
             }
+        }
+
+        private async Task<IList<TApiModel>?> GetSummaryAsync<TApiModel>(Uri url)
+          where TApiModel : class, IApiDataModel
+        {
+            var result = await apiDataProcessorService.GetAsync<IList<TApiModel>>(httpClient, url)
+              .ConfigureAwait(false);
+
+            apiCacheService.Clear();
+
+            return result;
+        }
+
+        private TModel? AddToApiCache<TModel>(TModel? model)
+            where TModel : class, IBaseContentItemModel<TModel>
+        {
+            if (model == null)
+            {
+                return null;
+            }
+
+            apiCacheService.AddOrUpdate(model!.Url!, model);
+            return model;
+        }
+
+        private TModel? GetFromApiCache<TModel>(Uri uri)
+            where TModel : class, IBaseContentItemModel<TModel>
+        {
+            return apiCacheService.Retrieve<TModel>(uri);
         }
     }
 }

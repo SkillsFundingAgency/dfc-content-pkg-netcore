@@ -3,6 +3,7 @@ using DFC.Content.Pkg.Netcore.CmsApiProcessorService.UnitTests.Models;
 using DFC.Content.Pkg.Netcore.Data.Contracts;
 using DFC.Content.Pkg.Netcore.Data.Models;
 using DFC.Content.Pkg.Netcore.Data.Models.ClientOptions;
+using DFC.Content.Pkg.Netcore.Services;
 using DFC.Content.Pkg.Netcore.Services.CmsApiProcessorService;
 using FakeItEasy;
 using Newtonsoft.Json.Linq;
@@ -36,7 +37,7 @@ namespace DFC.Content.Pkg.Netcore.CmsApiProcessorService.UnitTests
 
             A.CallTo(() => fakeApiDataProcessorService.GetAsync<IList<ApiSummaryModel>>(A<HttpClient>.Ignored, A<Uri>.Ignored)).Returns(nullExpectedResults);
 
-            var cmsApiService = new CmsApiService(CmsApiClientOptions, fakeApiDataProcessorService, fakeHttpClient, mapper);
+            var cmsApiService = new CmsApiService(CmsApiClientOptions, fakeApiDataProcessorService, fakeHttpClient, mapper, A.Fake<IApiCacheService>());
 
             // act
             var result = await cmsApiService.GetSummaryAsync<ApiSummaryModel>().ConfigureAwait(false);
@@ -54,7 +55,7 @@ namespace DFC.Content.Pkg.Netcore.CmsApiProcessorService.UnitTests
 
             A.CallTo(() => fakeApiDataProcessorService.GetAsync<IList<ApiSummaryModel>>(A<HttpClient>.Ignored, A<Uri>.Ignored)).Returns(expectedResults);
 
-            var cmsApiService = new CmsApiService(CmsApiClientOptions, fakeApiDataProcessorService, fakeHttpClient, mapper);
+            var cmsApiService = new CmsApiService(CmsApiClientOptions, fakeApiDataProcessorService, fakeHttpClient, mapper, A.Fake<IApiCacheService>());
 
             // act
             var result = await cmsApiService.GetSummaryAsync<ApiSummaryModel>().ConfigureAwait(false);
@@ -65,13 +66,54 @@ namespace DFC.Content.Pkg.Netcore.CmsApiProcessorService.UnitTests
         }
 
         [Fact]
+        public async Task CmsApiServiceGetItemNoChildrenReturnsSuccess()
+        {
+            // arrange
+            var expectedResult = A.Fake<ApiItemNoChildrenModel>();
+
+            A.CallTo(() => fakeApiDataProcessorService.GetAsync<ApiItemNoChildrenModel>(A<HttpClient>.Ignored, A<Uri>.Ignored)).Returns(expectedResult);
+
+            var cmsApiService = new CmsApiService(CmsApiClientOptions, fakeApiDataProcessorService, fakeHttpClient, mapper, new ApiCacheService());
+
+            // act
+            var result = await cmsApiService.GetItemAsync<ApiItemNoChildrenModel>("root-item-only", Guid.NewGuid()).ConfigureAwait(false);
+
+            // assert
+            A.CallTo(() => fakeApiDataProcessorService.GetAsync<ApiItemNoChildrenModel>(A<HttpClient>.Ignored, A<Uri>.Ignored)).MustHaveHappenedOnceExactly();
+            A.Equals(result, expectedResult);
+        }
+
+        [Fact]
+        public async Task CmsApiServiceGetItemNoChildrenByUrlReturnsSuccess()
+        {
+            // arrange
+            var expectedResult = A.Fake<ApiItemNoChildrenModel>();
+            var url = new Uri("https://www.somewhere.com", UriKind.Absolute);
+
+            A.CallTo(() => fakeApiDataProcessorService.GetAsync<ApiItemNoChildrenModel>(A<HttpClient>.Ignored, A<Uri>.Ignored)).Returns(expectedResult);
+
+            var cmsApiService = new CmsApiService(CmsApiClientOptions, fakeApiDataProcessorService, fakeHttpClient, mapper, new ApiCacheService());
+
+            // act
+            var result = await cmsApiService.GetItemAsync<ApiItemNoChildrenModel>(url).ConfigureAwait(false);
+
+            // assert
+            A.CallTo(() => fakeApiDataProcessorService.GetAsync<ApiItemNoChildrenModel>(A<HttpClient>.Ignored, A<Uri>.Ignored)).MustHaveHappenedOnceExactly();
+            A.Equals(result, expectedResult);
+        }
+
+        [Fact]
         public async Task CmsApiServiceGetItemReturnsSuccess()
         {
             // arrange
             var expectedResult = A.Fake<ApiItemModel>();
             var expectedItemResult = A.Fake<ApiContentItemModel>();
+            expectedItemResult.Url = new Uri("http://www.testChild.com");
+
             var url = new Uri($"{CmsApiClientOptions.BaseAddress}api/someitem", UriKind.Absolute);
+            expectedResult.Url = url;
             var contentUrl = new Uri("http://www.test.com");
+
             var childContentUrl = new Uri("http://www.testChild.com");
             A.CallTo(() => fakeApiDataProcessorService.GetAsync<ApiItemModel>(A<HttpClient>.Ignored, A<Uri>.Ignored)).Returns(expectedResult);
             A.CallTo(() => fakeApiDataProcessorService.GetAsync<ApiContentItemModel>(A<HttpClient>.Ignored, contentUrl)).Returns(expectedItemResult);
@@ -107,7 +149,7 @@ namespace DFC.Content.Pkg.Netcore.CmsApiProcessorService.UnitTests
                 },
             };
 
-            var cmsApiService = new CmsApiService(CmsApiClientOptions, fakeApiDataProcessorService, fakeHttpClient, mapper);
+            var cmsApiService = new CmsApiService(CmsApiClientOptions, fakeApiDataProcessorService, fakeHttpClient, mapper, new ApiCacheService());
 
             // act
             var result = await cmsApiService.GetItemAsync<ApiItemModel, ApiContentItemModel>(url).ConfigureAwait(false);
@@ -118,7 +160,8 @@ namespace DFC.Content.Pkg.Netcore.CmsApiProcessorService.UnitTests
                 expectedItemResult.ContentLinks.ContentLinks.SelectMany(contentLink => contentLink.Value).Count();
 
             A.CallTo(() => fakeApiDataProcessorService.GetAsync<ApiItemModel>(A<HttpClient>.Ignored, A<Uri>.Ignored)).MustHaveHappenedOnceExactly();
-            A.CallTo(() => fakeApiDataProcessorService.GetAsync<ApiContentItemModel>(A<HttpClient>.Ignored, A<Uri>.Ignored)).MustHaveHappened(expectedCount, Times.Exactly);
+            // Account for cache hit on child item
+            A.CallTo(() => fakeApiDataProcessorService.GetAsync<ApiContentItemModel>(A<HttpClient>.Ignored, A<Uri>.Ignored)).MustHaveHappened(expectedCount - 1, Times.Exactly);
             A.Equals(result, expectedResult);
         }
 
@@ -131,7 +174,7 @@ namespace DFC.Content.Pkg.Netcore.CmsApiProcessorService.UnitTests
 
             A.CallTo(() => fakeApiDataProcessorService.GetAsync<ApiContentItemModel>(A<HttpClient>.Ignored, A<Uri>.Ignored)).Returns(expectedResult);
 
-            var cmsApiService = new CmsApiService(CmsApiClientOptions, fakeApiDataProcessorService, fakeHttpClient, mapper);
+            var cmsApiService = new CmsApiService(CmsApiClientOptions, fakeApiDataProcessorService, fakeHttpClient, mapper, A.Fake<IApiCacheService>());
 
             // act
             var result = await cmsApiService.GetContentItemAsync<ApiContentItemModel>(url).ConfigureAwait(false);
@@ -147,7 +190,7 @@ namespace DFC.Content.Pkg.Netcore.CmsApiProcessorService.UnitTests
             // arrange
             ApiContentItemModel? expectedResult = null;
 
-            var cmsApiService = new CmsApiService(CmsApiClientOptions, fakeApiDataProcessorService, fakeHttpClient, mapper);
+            var cmsApiService = new CmsApiService(CmsApiClientOptions, fakeApiDataProcessorService, fakeHttpClient, mapper, A.Fake<IApiCacheService>());
 
             // act
             var result = await cmsApiService.GetContentItemAsync<ApiContentItemModel>(null).ConfigureAwait(false);
@@ -167,7 +210,7 @@ namespace DFC.Content.Pkg.Netcore.CmsApiProcessorService.UnitTests
 
             A.CallTo(() => fakeApiDataProcessorService.GetAsync<ApiItemModel>(A<HttpClient>.Ignored, A<Uri>.Ignored)).Returns(expectedResult);
 
-            var cmsApiService = new CmsApiService(cmsApiClientOptions, fakeApiDataProcessorService, fakeHttpClient, mapper);
+            var cmsApiService = new CmsApiService(cmsApiClientOptions, fakeApiDataProcessorService, fakeHttpClient, mapper, A.Fake<IApiCacheService>());
 
             // act
             var result = await cmsApiService.GetContentAsync<ApiItemModel>().ConfigureAwait(false);
