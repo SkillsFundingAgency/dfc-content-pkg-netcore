@@ -2,8 +2,9 @@
 {
     public enum ContentCacheStatus
     {
-        Content = 0,
-        ContentItem = 1,
-        NotFound = 2,
+        NotFound = 0,
+        Content = 1,
+        ContentItem = 2,
+        Both = Content | ContentItem,
     }
 }

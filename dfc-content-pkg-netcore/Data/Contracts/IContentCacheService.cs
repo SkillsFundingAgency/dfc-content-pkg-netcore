@@ -1,4 +1,5 @@
 ﻿using DFC.Content.Pkg.Netcore.Data.Enums;
+using DFC.Content.Pkg.Netcore.Data.Models;
 using System;
 using System.Collections.Generic;
 
@@ -16,6 +17,8 @@ namespace DFC.Content.Pkg.Netcore.Data.Contracts
 
         void RemoveContentItem(Guid contentId, Guid contentItemId);
 
-        void AddOrReplace(Guid contentId, List<Guid> contentItemIds);
+        void AddOrReplace(Guid contentId, List<Guid> contentItemIds, string parentContentType = "default");
+
+        IEnumerable<ContentCacheResult> GetContentCacheStatus(Guid contentItemId);
     }
 }

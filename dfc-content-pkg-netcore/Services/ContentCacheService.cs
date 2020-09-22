@@ -1,5 +1,6 @@
 ﻿using DFC.Content.Pkg.Netcore.Data.Contracts;
 using DFC.Content.Pkg.Netcore.Data.Enums;
+using DFC.Content.Pkg.Netcore.Data.Models;
 using Microsoft.Extensions.Logging;
 using NHibernate.Util;
 using System;
@@ -17,21 +18,65 @@ namespace DFC.Content.Pkg.Netcore.Services
             this.logger = logger;
         }
 
-        private IDictionary<Guid, List<Guid>> ContentItems { get; set; } = new Dictionary<Guid, List<Guid>>();
+        private IDictionary<KeyValuePair<string, Guid>, List<Guid>> ContentItems { get; set; } = new Dictionary<KeyValuePair<string, Guid>, List<Guid>>();
+
+        public IEnumerable<ContentCacheResult> GetContentCacheStatus(Guid contentItemId)
+        {
+            var listToReturn = new List<ContentCacheResult>();
+
+            var contentResult = ContentItems.Where(x => x.Key.Value == contentItemId);
+
+            if (contentResult != null && contentResult.Any())
+            {
+                foreach (var result in contentResult)
+                {
+                    listToReturn.Add(new ContentCacheResult() { ContentType = result.Key.Key, Result = ContentCacheStatus.Content });
+                }
+            }
+
+            var contentItemResult = ContentItems.Where(x => x.Value.Contains(contentItemId));
+
+            if (contentItemResult != null && contentItemResult.Any())
+            {
+                foreach (var result in contentItemResult)
+                {
+                    listToReturn.Add(new ContentCacheResult() { ContentType = result.Key.Key, Result = ContentCacheStatus.ContentItem });
+                }
+            }
+
+            if (!listToReturn.Any())
+            {
+                listToReturn.Add(new ContentCacheResult { ContentType = string.Empty, Result = ContentCacheStatus.NotFound });
+            }
+
+            return listToReturn;
+        }
 
         public ContentCacheStatus CheckIsContentItem(Guid contentItemId)
         {
-            if (ContentItems.Any(z => z.Key == contentItemId))
+            bool isContent = false;
+
+            if (ContentItems.Any(z => z.Key.Value == contentItemId))
             {
-                return ContentCacheStatus.Content;
+                isContent = true;
             }
 
             foreach (var contentId in ContentItems.Keys)
             {
                 if (ContentItems[contentId].Contains(contentItemId))
                 {
+                    if (isContent)
+                    {
+                        return ContentCacheStatus.Both;
+                    }
+
                     return ContentCacheStatus.ContentItem;
                 }
+            }
+
+            if (isContent)
+            {
+                return ContentCacheStatus.Content;
             }
 
             return ContentCacheStatus.NotFound;
@@ -45,46 +90,47 @@ namespace DFC.Content.Pkg.Netcore.Services
 
         public IList<Guid> GetContentIdsContainingContentItemId(Guid contentItemId)
         {
-            var contentIds = new List<Guid>();
+            var contentItemIdsContaining = ContentItems.Where(x => x.Value.Contains(contentItemId)).Select(z => z.Key.Value);
 
-            foreach (var contentId in ContentItems.Keys)
-            {
-                if (ContentItems[contentId].Contains(contentItemId))
-                {
-                    contentIds.Add(contentId);
-                }
-            }
-
-            return contentIds;
+            return contentItemIdsContaining.ToList();
         }
 
         public void Remove(Guid contentId)
         {
             logger.LogInformation($"Removing Content {contentId} from cache");
 
-            if (ContentItems.ContainsKey(contentId))
+            var matchingKeys = ContentItems.Where(x => x.Key.Value == contentId).Select(z => z.Key);
+
+            foreach (var key in matchingKeys)
             {
-                ContentItems.Remove(contentId);
+                ContentItems.Remove(key);
             }
         }
 
         public void RemoveContentItem(Guid contentId, Guid contentItemId)
         {
-            if (ContentItems.ContainsKey(contentId))
+            if (ContentItems.Any(x => x.Key.Value == contentId))
             {
-                ContentItems[contentId].Remove(contentItemId);
+                var matchingKeys = ContentItems.Where(x => x.Key.Value == contentId && x.Value.Contains(contentItemId)).Select(z => z.Key);
+
+                foreach (var key in matchingKeys)
+                {
+                    ContentItems[key].Remove(contentItemId);
+                }
             }
         }
 
-        public void AddOrReplace(Guid contentId, List<Guid> contentItemIds)
+        public void AddOrReplace(Guid contentId, List<Guid> contentItemIds, string parentContentType = "default")
         {
-            if (ContentItems.ContainsKey(contentId))
+            var hasKey = ContentItems.Any(x => x.Key.Value == contentId);
+
+            if (hasKey)
             {
-                ContentItems[contentId] = contentItemIds;
+                ContentItems[ContentItems.FirstOrDefault(x => x.Key.Value == contentId).Key] = contentItemIds;
             }
             else
             {
-                ContentItems.Add(contentId, contentItemIds);
+                ContentItems.Add(new KeyValuePair<string, Guid>(parentContentType, contentId), contentItemIds);
             }
         }
     }
