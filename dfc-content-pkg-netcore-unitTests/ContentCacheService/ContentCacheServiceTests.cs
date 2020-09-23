@@ -70,12 +70,13 @@ namespace DFC.Content.Pkg.Netcore.CmsApiProcessorService.UnitTests
         public void ContentCacheServiceGetContentCacheStatusReturnsStatusContentAndContentItem()
         {
             // arrange
-            IEnumerable<ContentCacheResult> expectedResult = new List<ContentCacheResult>() { new ContentCacheResult { ContentType = "default", Result = ContentCacheStatus.Content }, new ContentCacheResult { ContentType = "default", Result = ContentCacheStatus.ContentItem } };
             var contentItemId = Guid.NewGuid();
+            var contentId = Guid.NewGuid();
+            IEnumerable<ContentCacheResult> expectedResult = new List<ContentCacheResult>() { new ContentCacheResult { ContentType = "default", Result = ContentCacheStatus.Content }, new ContentCacheResult { ContentType = "default", ParentContentId = contentId, Result = ContentCacheStatus.ContentItem } };
 
             var contentCacheService = new ContentCacheService(A.Fake<ILogger<ContentCacheService>>());
 
-            contentCacheService.AddOrReplace(Guid.NewGuid(), new List<Guid> { Guid.NewGuid(), contentItemId, Guid.NewGuid(), });
+            contentCacheService.AddOrReplace(contentId, new List<Guid> { Guid.NewGuid(), contentItemId, Guid.NewGuid(), });
             contentCacheService.AddOrReplace(contentItemId, new List<Guid> { Guid.NewGuid(), Guid.NewGuid(), Guid.NewGuid(), });
 
             // act
