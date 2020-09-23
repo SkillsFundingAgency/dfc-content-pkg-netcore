@@ -40,7 +40,7 @@ namespace DFC.Content.Pkg.Netcore.Services
             {
                 foreach (var result in contentItemResult)
                 {
-                    listToReturn.Add(new ContentCacheResult() { ContentType = result.Key.Key, Result = ContentCacheStatus.ContentItem });
+                    listToReturn.Add(new ContentCacheResult() { ParentContentId = result.Key.Value, ContentType = result.Key.Key, Result = ContentCacheStatus.ContentItem });
                 }
             }
 
