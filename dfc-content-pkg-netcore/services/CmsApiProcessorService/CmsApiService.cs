@@ -150,7 +150,7 @@ namespace DFC.Content.Pkg.Netcore.Services.CmsApiProcessorService
                 {
                     if (linkDetail.ContentType != null && linkDetail.ContentType.StartsWith("esco__", StringComparison.CurrentCultureIgnoreCase))
                     {
-                        var newLink = linkDetail.Uri.ToString().Replace("esco__", "", StringComparison.CurrentCultureIgnoreCase);
+                        var newLink = linkDetail.Uri!.ToString().Replace("esco__", string.Empty, StringComparison.CurrentCultureIgnoreCase);
                         linkDetail.Uri = new Uri(newLink);
                     }
 
@@ -166,7 +166,7 @@ namespace DFC.Content.Pkg.Netcore.Services.CmsApiProcessorService
         {
             var mappingToUse = contentTypeMappingService.Mappings[linkDetail.ContentType!];
 
-            var pagesApiContentItemModel = GetFromApiCache(mappingToUse, linkDetail.Uri) ?? AddToApiCache(await GetContentItemAsync(mappingToUse, linkDetail!.Uri!).ConfigureAwait(false));
+            var pagesApiContentItemModel = GetFromApiCache(mappingToUse, linkDetail.Uri!) ?? AddToApiCache(await GetContentItemAsync(mappingToUse, linkDetail!.Uri!).ConfigureAwait(false));
 
             if (pagesApiContentItemModel != null)
             {

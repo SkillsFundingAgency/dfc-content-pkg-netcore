@@ -8,6 +8,11 @@ namespace DFC.Content.Pkg.Netcore.CmsApiProcessorService.UnitTests.Models
 {
     public class ApiItemNoChildrenModel : IBaseContentItemModel
     {
+        public ApiItemNoChildrenModel()
+        {
+            ContentItems = new List<IBaseContentItemModel>();
+        }
+
         [JsonProperty("id")]
         public Guid? ItemId { get; set; }
 
@@ -25,6 +30,6 @@ namespace DFC.Content.Pkg.Netcore.CmsApiProcessorService.UnitTests.Models
 
         public ContentLinksModel? ContentLinks { get; set; }
 
-        public IList<IBaseContentItemModel>? ContentItems { get; set; }
+        public IList<IBaseContentItemModel> ContentItems { get; set; }
     }
 }
