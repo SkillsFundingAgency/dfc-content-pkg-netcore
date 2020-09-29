@@ -9,6 +9,7 @@ namespace DFC.Content.Pkg.Netcore.Data.Contracts
         ContentLinksModel? ContentLinks { get; set; }
 
         IList<IBaseContentItemModel> ContentItems { get; set; }
+
         Guid? ItemId { get; set; }
     }
 }
