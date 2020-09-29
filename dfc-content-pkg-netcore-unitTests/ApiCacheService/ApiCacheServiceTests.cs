@@ -35,7 +35,7 @@ namespace DFC.Content.Pkg.Netcore.UnitTests
 
             //Assert
             Assert.Equal(1, serviceToTest.Count);
-            Assert.Equal(itemToCache.Description, result.Description);
+            Assert.Equal(itemToCache.Description, result!.Description);
         }
 
         [Fact]
@@ -78,7 +78,7 @@ namespace DFC.Content.Pkg.Netcore.UnitTests
 
             //Assert
             Assert.Equal(1, serviceToTest.Count);
-            Assert.Equal(itemToCache.Description, result.Description);
+            Assert.Equal(itemToCache.Description, result!.Description);
         }
 
 
@@ -94,7 +94,7 @@ namespace DFC.Content.Pkg.Netcore.UnitTests
 
             //Assert
             Assert.Equal(1, serviceToTest.Count);
-            Assert.Equal(itemToCache.Description, result.Description);
+            Assert.Equal(itemToCache.Description, result!.Description);
         }
 
         [Fact]
@@ -121,8 +121,8 @@ namespace DFC.Content.Pkg.Netcore.UnitTests
 
             //Act
             //Assert
-            serviceToTest.AddOrUpdate(new Uri("http://somewhere.com/aresource"), itemToCache);
-            Assert.Throws<ArgumentNullException>(() => serviceToTest.Retrieve(itemToCache, new Uri("http://somewhere.com/aresource")));
+            serviceToTest.AddOrUpdate(new Uri("http://somewhere.com/aresource"), itemToCache!);
+            Assert.Throws<ArgumentNullException>(() => itemToCache = serviceToTest.Retrieve(itemToCache, new Uri("http://somewhere.com/aresource")));
         }
     }
 }

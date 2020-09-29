@@ -43,7 +43,7 @@ namespace DFC.Content.Pkg.Netcore.Services
             return null;
         }
 
-        public TModel? Retrieve<TModel>(TModel type, Uri id)
+        public TModel? Retrieve<TModel>(TModel? type, Uri id)
             where TModel : class
         {
             if (type == null)
