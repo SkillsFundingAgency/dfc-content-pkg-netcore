@@ -87,10 +87,13 @@ namespace DFC.Content.Pkg.Netcore.Data.Models
 
                 Enum.TryParse(typeof(ContentRelationship), relationShipKey, true, out var type);
 
-                if (type == null || (ContentRelationship)type == ContentRelationship.Undefined ||
-                    ((ContentRelationship)type == ContentRelationship.HasPageLocation && ExcludePageLocation))
+                if (type != null)
                 {
-                    continue;
+                    if ((ContentRelationship)type == ContentRelationship.Undefined ||
+                        ((ContentRelationship)type == ContentRelationship.HasPageLocation && ExcludePageLocation))
+                    {
+                        continue;
+                    }
                 }
 
                 if (jValue is JArray)

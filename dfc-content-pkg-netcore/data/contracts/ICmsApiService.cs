@@ -16,14 +16,10 @@ namespace DFC.Content.Pkg.Netcore.Data.Contracts
            where TModel : class, IApiDataModel;
 
         Task<TModel?> GetItemAsync<TModel>(Uri url)
-           where TModel : class, IApiDataModel;
-
-        Task<TModel?> GetItemAsync<TModel, TChild>(Uri url)
-            where TModel : class, IBaseContentItemModel<TChild>
-            where TChild : class, IBaseContentItemModel<TChild>;
+           where TModel : class, IBaseContentItemModel;
 
         Task<TChild?> GetContentItemAsync<TChild>(Uri? uri)
-            where TChild : class, IBaseContentItemModel<TChild>;
+            where TChild : class, IBaseContentItemModel;
 
         Task<List<TApiModel>?> GetContentAsync<TApiModel>()
             where TApiModel : class;

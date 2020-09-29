@@ -10,6 +10,9 @@ namespace DFC.Content.Pkg.Netcore.Data.Contracts
         Task<TApiModel?> GetAsync<TApiModel>(HttpClient? httpClient, Uri url)
             where TApiModel : class;
 
+        Task<TApiModel?> GetAsync<TApiModel>(TApiModel type, HttpClient? httpClient, Uri url)
+            where TApiModel : class;
+
         Task<HttpStatusCode> PostAsync(HttpClient? httpClient, Uri url);
 
         Task<HttpStatusCode> PostAsync<TModel>(HttpClient? httpClient, Uri url, TModel model)

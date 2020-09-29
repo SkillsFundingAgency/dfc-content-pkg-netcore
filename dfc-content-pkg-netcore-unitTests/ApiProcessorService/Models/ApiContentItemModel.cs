@@ -7,7 +7,7 @@ using System.Collections.Generic;
 
 namespace DFC.Content.Pkg.Netcore.ApiProcessorService.UnitTests.Models
 {
-    public class ApiContentItemModel : IBaseContentItemModel<ApiContentItemModel>
+    public class ApiContentItemModel : IBaseContentItemModel
     {
         [JsonProperty("Uri")]
         public Uri? Url { get; set; }
@@ -54,7 +54,7 @@ namespace DFC.Content.Pkg.Netcore.ApiProcessorService.UnitTests.Models
         }
 
         [JsonIgnore]
-        public IList<ApiContentItemModel> ContentItems { get; set; } = new List<ApiContentItemModel>();
+        public IList<IBaseContentItemModel> ContentItems { get; set; } = new List<IBaseContentItemModel>();
 
         [JsonIgnore]
         private ContentLinksModel? PrivateLinksModel { get; set; }

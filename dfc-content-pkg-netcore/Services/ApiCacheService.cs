@@ -42,5 +42,16 @@ namespace DFC.Content.Pkg.Netcore.Services
 
             return null;
         }
+
+        public TModel? Retrieve<TModel>(TModel type, Uri id)
+            where TModel : class
+        {
+            if (CachedItems.ContainsKey(id))
+            {
+                return (TModel)JsonConvert.DeserializeObject(CachedItems[id], type.GetType());
+            }
+
+            return null;
+        }
     }
 }
