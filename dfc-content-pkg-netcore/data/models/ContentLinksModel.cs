@@ -85,15 +85,9 @@ namespace DFC.Content.Pkg.Netcore.Data.Models
                     string.Empty,
                     StringComparison.CurrentCultureIgnoreCase);
 
-                Enum.TryParse(typeof(ContentRelationship), relationShipKey, true, out var type);
-
-                if (type != null)
+                if (relationShipKey.Equals("HasPageLocation", StringComparison.CurrentCultureIgnoreCase) && ExcludePageLocation)
                 {
-                    if ((ContentRelationship)type == ContentRelationship.Undefined ||
-                        ((ContentRelationship)type == ContentRelationship.HasPageLocation && ExcludePageLocation))
-                    {
-                        continue;
-                    }
+                    continue;
                 }
 
                 if (jValue is JArray)
