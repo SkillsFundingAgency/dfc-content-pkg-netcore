@@ -1,7 +1,7 @@
 ﻿using DFC.Content.Pkg.Netcore.Data.Contracts;
 using System.Collections.Generic;
 
-namespace DFC.Content.Pkg.Netcore.Services.ContentTypeMappingService
+namespace DFC.Content.Pkg.Netcore.Services
 {
     public class ContentTypeMappingService : IContentTypeMappingService
     {
