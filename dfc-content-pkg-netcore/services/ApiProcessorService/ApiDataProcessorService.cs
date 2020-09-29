@@ -35,13 +35,14 @@ namespace DFC.Content.Pkg.Netcore.Services.ApiProcessorService
         public async Task<TApiModel?> GetAsync<TApiModel>(TApiModel type, HttpClient? httpClient, Uri url)
             where TApiModel : class
         {
+            _ = type ?? throw new ArgumentNullException(nameof(type));
             _ = httpClient ?? throw new ArgumentNullException(nameof(httpClient));
 
             var response = await apiService.GetAsync(httpClient, url, MediaTypeNames.Application.Json).ConfigureAwait(false);
 
             if (!string.IsNullOrWhiteSpace(response))
             {
-                return (TApiModel)JsonConvert.DeserializeObject(response, type.GetType());
+                return (TApiModel?)JsonConvert.DeserializeObject(response, type.GetType());
             }
 
             return default;

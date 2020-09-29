@@ -82,7 +82,8 @@ namespace DFC.Content.Pkg.Netcore.Services.CmsApiProcessorService
         {
             if (uri != null)
             {
-                if (uri.ToString().Contains(@"//skill") || uri.ToString().Contains(@"//knowledge")) {
+                if (uri.ToString().Contains(@"//skill", StringComparison.CurrentCultureIgnoreCase) || uri.ToString().Contains(@"//knowledge", StringComparison.CurrentCultureIgnoreCase))
+                {
                     return null;
                 }
 
@@ -98,7 +99,7 @@ namespace DFC.Content.Pkg.Netcore.Services.CmsApiProcessorService
         {
             if (uri != null)
             {
-                if (uri.ToString().Contains(@"//skill") || uri.ToString().Contains(@"//knowledge"))
+                if (uri.ToString().Contains(@"//skill", StringComparison.OrdinalIgnoreCase) || uri.ToString().Contains(@"//knowledge", StringComparison.OrdinalIgnoreCase))
                 {
                     return null;
                 }
@@ -147,31 +148,36 @@ namespace DFC.Content.Pkg.Netcore.Services.CmsApiProcessorService
 
                 foreach (var linkDetail in linkDetails)
                 {
-                    if (linkDetail.ContentType != null && linkDetail.ContentType.StartsWith("esco__"))
+                    if (linkDetail.ContentType != null && linkDetail.ContentType.StartsWith("esco__", StringComparison.CurrentCultureIgnoreCase))
                     {
-                        var newLink = linkDetail.Uri.ToString().Replace("esco__", "");
+                        var newLink = linkDetail.Uri.ToString().Replace("esco__", "", StringComparison.CurrentCultureIgnoreCase);
                         linkDetail.Uri = new Uri(newLink);
                     }
 
                     if (linkDetail.Uri != null)
                     {
-                        var mappingToUse = contentTypeMappingService.Mappings[linkDetail.ContentType!];
-
-                        var pagesApiContentItemModel = GetFromApiCache(mappingToUse, linkDetail.Uri) ?? AddToApiCache(await GetContentItemAsync(mappingToUse, linkDetail!.Uri!).ConfigureAwait(false));
-
-                        if (pagesApiContentItemModel != null)
-                        {
-                            mapper.Map(linkDetail, pagesApiContentItemModel);
-
-                            if (pagesApiContentItemModel.ContentLinks != null)
-                            {
-                                await GetSharedChildContentItems(pagesApiContentItemModel.ContentLinks, pagesApiContentItemModel.ContentItems).ConfigureAwait(false);
-                            }
-
-                            contentItem.Add(pagesApiContentItemModel!);
-                        }
+                        await GetAndMapContentItem(contentItem, linkDetail).ConfigureAwait(false);
                     }
                 }
+            }
+        }
+
+        private async Task GetAndMapContentItem(IList<IBaseContentItemModel> contentItem, LinkDetails linkDetail)
+        {
+            var mappingToUse = contentTypeMappingService.Mappings[linkDetail.ContentType!];
+
+            var pagesApiContentItemModel = GetFromApiCache(mappingToUse, linkDetail.Uri) ?? AddToApiCache(await GetContentItemAsync(mappingToUse, linkDetail!.Uri!).ConfigureAwait(false));
+
+            if (pagesApiContentItemModel != null)
+            {
+                mapper.Map(linkDetail, pagesApiContentItemModel);
+
+                if (pagesApiContentItemModel.ContentLinks != null)
+                {
+                    await GetSharedChildContentItems(pagesApiContentItemModel.ContentLinks, pagesApiContentItemModel.ContentItems).ConfigureAwait(false);
+                }
+
+                contentItem.Add(pagesApiContentItemModel!);
             }
         }
 
