@@ -136,15 +136,15 @@ namespace DFC.Content.Pkg.Netcore.Services.CmsApiProcessorService
 
         private async Task GetSharedChildContentItems(ContentLinksModel? model, IList<IBaseContentItemModel> contentItem)
         {
-            if (!contentTypeMappingService.Mappings.Any())
-            {
-                throw new InvalidOperationException($"No mappings have been added to {nameof(contentTypeMappingService)}. Please add mappings before calling {nameof(GetSharedChildContentItems)}");
-            }
-
             var linkDetails = model?.ContentLinks.SelectMany(contentLink => contentLink.Value);
 
             if (linkDetails != null && linkDetails.Any())
             {
+                if (!contentTypeMappingService.Mappings.Any())
+                {
+                    throw new InvalidOperationException($"No mappings have been added to {nameof(contentTypeMappingService)}. Please add mappings before calling {nameof(GetSharedChildContentItems)}");
+                }
+
                 foreach (var linkDetail in linkDetails)
                 {
                     if (linkDetail.ContentType != null && linkDetail.ContentType.StartsWith("esco__"))

@@ -22,7 +22,7 @@ namespace DFC.Content.Pkg.Netcore.CmsApiProcessorService.UnitTests.Models
 
         [JsonProperty(PropertyName = "uri")]
         public Uri? Url { get; set; }
-        public ContentLinksModel? ContentLinks { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
-        public IList<IBaseContentItemModel> ContentItems { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+        public ContentLinksModel? ContentLinks { get; set; }
+        public IList<IBaseContentItemModel> ContentItems { get; set; }
     }
 }
