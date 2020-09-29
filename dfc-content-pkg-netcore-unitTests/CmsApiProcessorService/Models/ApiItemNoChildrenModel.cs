@@ -1,11 +1,18 @@
 ﻿using DFC.Content.Pkg.Netcore.Data.Contracts;
+using DFC.Content.Pkg.Netcore.Data.Models;
 using Newtonsoft.Json;
 using System;
+using System.Collections.Generic;
 
 namespace DFC.Content.Pkg.Netcore.CmsApiProcessorService.UnitTests.Models
 {
-    public class ApiItemNoChildrenModel : IApiDataModel
+    public class ApiItemNoChildrenModel : IBaseContentItemModel
     {
+        public ApiItemNoChildrenModel()
+        {
+            ContentItems = new List<IBaseContentItemModel>();
+        }
+
         [JsonProperty("id")]
         public Guid? ItemId { get; set; }
 
@@ -20,5 +27,9 @@ namespace DFC.Content.Pkg.Netcore.CmsApiProcessorService.UnitTests.Models
 
         [JsonProperty(PropertyName = "uri")]
         public Uri? Url { get; set; }
+
+        public ContentLinksModel? ContentLinks { get; set; }
+
+        public IList<IBaseContentItemModel> ContentItems { get; set; }
     }
 }

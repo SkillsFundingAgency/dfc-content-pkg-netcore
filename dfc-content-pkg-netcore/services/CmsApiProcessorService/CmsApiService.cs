@@ -17,19 +17,22 @@ namespace DFC.Content.Pkg.Netcore.Services.CmsApiProcessorService
         private readonly HttpClient httpClient;
         private readonly AutoMapper.IMapper mapper;
         private readonly IApiCacheService apiCacheService;
+        private readonly IContentTypeMappingService contentTypeMappingService;
 
         public CmsApiService(
             CmsApiClientOptions cmsApiClientOptions,
             IApiDataProcessorService apiDataProcessorService,
             HttpClient httpClient,
             IMapper mapper,
-            IApiCacheService apiCacheService)
+            IApiCacheService apiCacheService,
+            IContentTypeMappingService contentTypeMappingService)
         {
             this.cmsApiClientOptions = cmsApiClientOptions;
             this.apiDataProcessorService = apiDataProcessorService;
             this.httpClient = httpClient;
             this.mapper = mapper;
             this.apiCacheService = apiCacheService;
+            this.contentTypeMappingService = contentTypeMappingService;
         }
 
         public async Task<IList<TApiModel>?> GetSummaryAsync<TApiModel>(string contentType)
@@ -61,14 +64,7 @@ namespace DFC.Content.Pkg.Netcore.Services.CmsApiProcessorService
         }
 
         public async Task<TModel?> GetItemAsync<TModel>(Uri url)
-           where TModel : class, IApiDataModel
-        {
-            return await apiDataProcessorService.GetAsync<TModel>(httpClient, url).ConfigureAwait(false);
-        }
-
-        public async Task<TModel?> GetItemAsync<TModel, TChild>(Uri url)
-            where TModel : class, IBaseContentItemModel<TChild>
-            where TChild : class, IBaseContentItemModel<TChild>
+           where TModel : class, IBaseContentItemModel
         {
             var apiDataModel = await apiDataProcessorService.GetAsync<TModel>(httpClient, url)
                 .ConfigureAwait(false);
@@ -82,15 +78,33 @@ namespace DFC.Content.Pkg.Netcore.Services.CmsApiProcessorService
         }
 
         public async Task<TChild?> GetContentItemAsync<TChild>(Uri? uri)
-             where TChild : class, IBaseContentItemModel<TChild>
+             where TChild : class, IBaseContentItemModel
         {
             if (uri != null)
             {
-                if (uri.ToString().Contains(@"//skill") || uri.ToString().Contains(@"//knowledge")) {
+                if (uri.ToString().Contains(@"//skill", StringComparison.CurrentCultureIgnoreCase) || uri.ToString().Contains(@"//knowledge", StringComparison.CurrentCultureIgnoreCase))
+                {
                     return null;
                 }
 
                 return await apiDataProcessorService.GetAsync<TChild>(httpClient, uri)
+                    .ConfigureAwait(false);
+            }
+
+            return null;
+        }
+
+        public async Task<TChild?> GetContentItemAsync<TChild>(TChild type, Uri? uri)
+             where TChild : class, IBaseContentItemModel
+        {
+            if (uri != null)
+            {
+                if (uri.ToString().Contains(@"//skill", StringComparison.OrdinalIgnoreCase) || uri.ToString().Contains(@"//knowledge", StringComparison.OrdinalIgnoreCase))
+                {
+                    return null;
+                }
+
+                return await apiDataProcessorService.GetAsync<TChild>(type, httpClient, uri)
                     .ConfigureAwait(false);
             }
 
@@ -121,38 +135,49 @@ namespace DFC.Content.Pkg.Netcore.Services.CmsApiProcessorService
             return contentList;
         }
 
-        private async Task GetSharedChildContentItems<TModel>(ContentLinksModel? model, IList<TModel> contentItem)
-            where TModel : class, IBaseContentItemModel<TModel>
+        private async Task GetSharedChildContentItems(ContentLinksModel? model, IList<IBaseContentItemModel> contentItem)
         {
             var linkDetails = model?.ContentLinks.SelectMany(contentLink => contentLink.Value);
 
             if (linkDetails != null && linkDetails.Any())
             {
+                if (!contentTypeMappingService.Mappings.Any())
+                {
+                    throw new InvalidOperationException($"No mappings have been added to {nameof(contentTypeMappingService)}. Please add mappings before calling {nameof(GetSharedChildContentItems)}");
+                }
+
                 foreach (var linkDetail in linkDetails)
                 {
-                    if (linkDetail.ContentType != null && linkDetail.ContentType.StartsWith("esco__"))
+                    if (linkDetail.ContentType != null && linkDetail.ContentType.StartsWith("esco__", StringComparison.CurrentCultureIgnoreCase))
                     {
-                        var newLink = linkDetail.Uri.ToString().Replace("esco__", "");
+                        var newLink = linkDetail.Uri!.ToString().Replace("esco__", string.Empty, StringComparison.CurrentCultureIgnoreCase);
                         linkDetail.Uri = new Uri(newLink);
                     }
 
                     if (linkDetail.Uri != null)
                     {
-                        var pagesApiContentItemModel = GetFromApiCache<TModel>(linkDetail.Uri) ?? AddToApiCache(await GetContentItemAsync<TModel>(linkDetail!.Uri!).ConfigureAwait(false));
-
-                        if (pagesApiContentItemModel != null)
-                        {
-                            mapper.Map(linkDetail, pagesApiContentItemModel);
-
-                            if (pagesApiContentItemModel.ContentLinks != null)
-                            {
-                                await GetSharedChildContentItems(pagesApiContentItemModel.ContentLinks, pagesApiContentItemModel.ContentItems).ConfigureAwait(false);
-                            }
-
-                            contentItem.Add(pagesApiContentItemModel);
-                        }
+                        await GetAndMapContentItem(contentItem, linkDetail).ConfigureAwait(false);
                     }
                 }
+            }
+        }
+
+        private async Task GetAndMapContentItem(IList<IBaseContentItemModel> contentItem, LinkDetails linkDetail)
+        {
+            var mappingToUse = contentTypeMappingService.Mappings[linkDetail.ContentType!];
+
+            var pagesApiContentItemModel = GetFromApiCache(mappingToUse, linkDetail.Uri!) ?? AddToApiCache(await GetContentItemAsync(mappingToUse, linkDetail!.Uri!).ConfigureAwait(false));
+
+            if (pagesApiContentItemModel != null)
+            {
+                mapper.Map(linkDetail, pagesApiContentItemModel);
+
+                if (pagesApiContentItemModel.ContentLinks != null)
+                {
+                    await GetSharedChildContentItems(pagesApiContentItemModel.ContentLinks, pagesApiContentItemModel.ContentItems).ConfigureAwait(false);
+                }
+
+                contentItem.Add(pagesApiContentItemModel!);
             }
         }
 
@@ -168,7 +193,7 @@ namespace DFC.Content.Pkg.Netcore.Services.CmsApiProcessorService
         }
 
         private TModel? AddToApiCache<TModel>(TModel? model)
-            where TModel : class, IBaseContentItemModel<TModel>
+            where TModel : class, IBaseContentItemModel
         {
             if (model == null)
             {
@@ -179,10 +204,10 @@ namespace DFC.Content.Pkg.Netcore.Services.CmsApiProcessorService
             return model;
         }
 
-        private TModel? GetFromApiCache<TModel>(Uri uri)
-            where TModel : class, IBaseContentItemModel<TModel>
+        private TModel? GetFromApiCache<TModel>(TModel type, Uri uri)
+           where TModel : class, IBaseContentItemModel
         {
-            return apiCacheService.Retrieve<TModel>(uri);
+            return apiCacheService.Retrieve(type, uri);
         }
     }
 }

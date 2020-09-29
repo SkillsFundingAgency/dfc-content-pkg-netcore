@@ -8,7 +8,7 @@ using System.Diagnostics.CodeAnalysis;
 namespace DFC.Content.Pkg.Netcore.Data.Models
 {
     [ExcludeFromCodeCoverage]
-    public class BaseContentItemModel : IBaseContentItemModel<BaseContentItemModel>
+    public class BaseContentItemModel : IBaseContentItemModel
     {
         [JsonProperty("Uri")]
         public Uri? Url { get; set; }
@@ -35,7 +35,7 @@ namespace DFC.Content.Pkg.Netcore.Data.Models
             set => PrivateLinksModel = value;
         }
 
-        public IList<BaseContentItemModel> ContentItems { get; set; } = new List<BaseContentItemModel>();
+        public IList<IBaseContentItemModel> ContentItems { get; set; } = new List<IBaseContentItemModel>();
 
         [JsonIgnore]
         private ContentLinksModel? PrivateLinksModel { get; set; }

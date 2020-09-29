@@ -1,5 +1,4 @@
-﻿using DFC.Content.Pkg.Netcore.Data.Enums;
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
@@ -85,10 +84,7 @@ namespace DFC.Content.Pkg.Netcore.Data.Models
                     string.Empty,
                     StringComparison.CurrentCultureIgnoreCase);
 
-                Enum.TryParse(typeof(ContentRelationship), relationShipKey, true, out var type);
-
-                if (type == null || (ContentRelationship)type == ContentRelationship.Undefined ||
-                    ((ContentRelationship)type == ContentRelationship.HasPageLocation && ExcludePageLocation))
+                if (relationShipKey.Equals("HasPageLocation", StringComparison.CurrentCultureIgnoreCase) && ExcludePageLocation)
                 {
                     continue;
                 }

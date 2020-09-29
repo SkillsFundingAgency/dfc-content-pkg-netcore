@@ -7,7 +7,7 @@ using System.Collections.Generic;
 
 namespace DFC.Content.Pkg.Netcore.CmsApiProcessorService.UnitTests.Models
 {
-    public class ApiItemModel : IBaseContentItemModel<ApiContentItemModel>
+    public class ApiItemModel : IBaseContentItemModel
     {
         [JsonProperty("id")]
         public Guid? ItemId { get; set; }
@@ -56,7 +56,7 @@ namespace DFC.Content.Pkg.Netcore.CmsApiProcessorService.UnitTests.Models
             set => PrivateLinksModel = value;
         }
 
-        public IList<ApiContentItemModel> ContentItems { get; set; } = new List<ApiContentItemModel>();
+        public IList<IBaseContentItemModel> ContentItems { get; set; } = new List<IBaseContentItemModel>();
 
         [JsonProperty(PropertyName = "ModifiedDate")]
         public DateTime Published { get; set; }
