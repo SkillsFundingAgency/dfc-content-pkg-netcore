@@ -22,6 +22,23 @@ namespace DFC.Content.Pkg.Netcore.UnitTests
         }
 
         [Fact]
+        public void ApiCacheServiceAddOrUpdateUpdatesItem()
+        {
+            //Arrange
+            var serviceToTest = new ApiCacheService();
+            var itemToCache = new ApiItemModel() { Description = "a test item" };
+
+            //Act
+            serviceToTest.AddOrUpdate(new Uri("http://somewhere.com/aresource"), new ApiItemModel());
+            serviceToTest.AddOrUpdate(new Uri("http://somewhere.com/aresource"), itemToCache);
+            var result = serviceToTest.Retrieve<ApiItemModel>(new Uri("http://somewhere.com/aresource"));
+
+            //Assert
+            Assert.Equal(1, serviceToTest.Count);
+            Assert.Equal(itemToCache.Description, result.Description);
+        }
+
+        [Fact]
         public void ApiCacheServiceClearClearsItems()
         {
             //Arrange
@@ -78,6 +95,34 @@ namespace DFC.Content.Pkg.Netcore.UnitTests
             //Assert
             Assert.Equal(1, serviceToTest.Count);
             Assert.Equal(itemToCache.Description, result.Description);
+        }
+
+        [Fact]
+        public void ApiCacheServiceRetrieveByTypeReturnsNullItem()
+        {
+            //Arrange
+            var serviceToTest = new ApiCacheService();
+            var itemToCache = new ApiItemModel() { Description = "a test item" };
+            //Act
+            serviceToTest.AddOrUpdate(new Uri("http://somewhere.com/aresource"), itemToCache);
+            var result = serviceToTest.Retrieve(itemToCache, new Uri("http://somewhere.com/aresource1"));
+
+            //Assert
+            Assert.Equal(1, serviceToTest.Count);
+            Assert.Null(result);
+        }
+
+        [Fact]
+        public void ApiCacheServiceRetrieveByNullTypeThrowsException()
+        {
+            //Arrange
+            var serviceToTest = new ApiCacheService();
+            ApiItemModel? itemToCache = null;
+
+            //Act
+            //Assert
+            serviceToTest.AddOrUpdate(new Uri("http://somewhere.com/aresource"), itemToCache);
+            Assert.Throws<ArgumentNullException>(() => serviceToTest.Retrieve(itemToCache, new Uri("http://somewhere.com/aresource")));
         }
     }
 }
