@@ -198,12 +198,6 @@ namespace DFC.Content.Pkg.Netcore.Services.CmsApiProcessorService
             return model;
         }
 
-        private TModel? GetFromApiCache<TModel>(Uri uri)
-            where TModel : class, IBaseContentItemModel
-        {
-            return apiCacheService.Retrieve<TModel>(uri);
-        }
-
         private TModel? GetFromApiCache<TModel>(TModel type, Uri uri)
            where TModel : class, IBaseContentItemModel
         {

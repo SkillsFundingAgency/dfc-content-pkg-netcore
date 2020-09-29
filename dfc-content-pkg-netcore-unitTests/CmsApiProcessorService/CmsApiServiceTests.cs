@@ -181,7 +181,7 @@ namespace DFC.Content.Pkg.Netcore.CmsApiProcessorService.UnitTests
 
             A.CallTo(() => fakeApiDataProcessorService.GetAsync<ApiContentItemModel>(A<HttpClient>.Ignored, A<Uri>.Ignored)).Returns(expectedResult);
 
-            var cmsApiService = new CmsApiService(CmsApiClientOptions, fakeApiDataProcessorService, fakeHttpClient, mapper, A.Fake<IApiCacheService>(), A.Fake<IContentTypeMappingService>());
+            var cmsApiService = new CmsApiService(CmsApiClientOptions, fakeApiDataProcessorService, fakeHttpClient, mapper, new ApiCacheService(), A.Fake<IContentTypeMappingService>());
 
             // act
             var result = await cmsApiService.GetContentItemAsync<ApiContentItemModel>(url).ConfigureAwait(false);
