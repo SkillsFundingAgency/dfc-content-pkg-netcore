@@ -17,7 +17,7 @@ namespace DFC.Content.Pkg.Netcore.Data.Models
         public Guid? ItemId { get; set; }
 
         [JsonProperty("skos__prefLabel")]
-        public string? Content { get; set; }
+        public string? Title { get; set; }
 
         [JsonProperty(PropertyName = "ModifiedDate")]
         public DateTime Published { get; set; }
