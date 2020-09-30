@@ -176,6 +176,7 @@ namespace DFC.Content.Pkg.Netcore.Services.CmsApiProcessorService
 
                     if (pagesApiContentItemModel.ContentLinks != null)
                     {
+                        pagesApiContentItemModel.ContentLinks.ExcludePageLocation = true;
                         await GetSharedChildContentItems(pagesApiContentItemModel.ContentLinks, pagesApiContentItemModel.ContentItems).ConfigureAwait(false);
                     }
 
