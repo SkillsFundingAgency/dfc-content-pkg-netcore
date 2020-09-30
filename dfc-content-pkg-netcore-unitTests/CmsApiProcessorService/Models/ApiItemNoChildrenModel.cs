@@ -31,5 +31,7 @@ namespace DFC.Content.Pkg.Netcore.CmsApiProcessorService.UnitTests.Models
         public ContentLinksModel? ContentLinks { get; set; }
 
         public IList<IBaseContentItemModel> ContentItems { get; set; }
+
+        public string? ContentType { get; set; }
     }
 }
