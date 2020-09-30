@@ -33,5 +33,33 @@ namespace DFC.Content.Pkg.Netcore.UnitTests
             //Assert
             Assert.Empty(serviceToTest.Mappings);
         }
+
+        [Fact]
+        public void ContentTypeMappingServiceGetMappingReturnsMapping()
+        {
+            //Arrange
+            var serviceToTest = new ContentTypeMappingService();
+
+            //Act
+            serviceToTest.AddMapping("foo", new ApiItemModel());
+            var result = serviceToTest.GetMapping("foo");
+
+            //Assert
+            Assert.IsType<ApiItemModel>(result);
+        }
+
+        [Fact]
+        public void ContentTypeMappingServiceGetMappingReturnsNull()
+        {
+            //Arrange
+            var serviceToTest = new ContentTypeMappingService();
+
+            //Act
+            serviceToTest.AddMapping("foo", new ApiItemModel());
+            var result = serviceToTest.GetMapping("bar");
+
+            //Assert
+            Assert.Null(result);
+        }
     }
 }

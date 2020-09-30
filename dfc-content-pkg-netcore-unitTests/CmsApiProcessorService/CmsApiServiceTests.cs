@@ -120,7 +120,7 @@ namespace DFC.Content.Pkg.Netcore.CmsApiProcessorService.UnitTests
             fakeDictionary.Add("test", new ApiContentItemModel());
 
             A.CallTo(() => fakeMappingService.Mappings).Returns(fakeDictionary);
-            A.CallTo(() => fakeApiDataProcessorService.GetAsync(A<ApiItemModel>.Ignored, A<HttpClient>.Ignored, A<Uri>.Ignored)).Returns(expectedResult);
+            A.CallTo(() => fakeApiDataProcessorService.GetAsync<ApiItemModel>(A<HttpClient>.Ignored, A<Uri>.Ignored)).Returns(expectedResult);
             A.CallTo(() => fakeApiDataProcessorService.GetAsync<ApiContentItemModel>(A<HttpClient>.Ignored, contentUrl)).Returns(expectedItemResult);
             A.CallTo(() => fakeApiDataProcessorService.GetAsync<ApiContentItemModel>(A<HttpClient>.Ignored, childContentUrl)).Returns(new ApiContentItemModel());
             expectedResult.ContentLinks = new ContentLinksModel(new JObject())

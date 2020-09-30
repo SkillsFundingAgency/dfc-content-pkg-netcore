@@ -6,6 +6,8 @@ namespace DFC.Content.Pkg.Netcore.Data.Contracts
     {
         Dictionary<string, IBaseContentItemModel> Mappings { get; }
 
+        IBaseContentItemModel? GetMapping(string contentType);
+
         void AddMapping(string contentType, IBaseContentItemModel model);
 
         void RemoveMapping(string contentType);

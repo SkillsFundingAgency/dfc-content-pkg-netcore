@@ -164,20 +164,23 @@ namespace DFC.Content.Pkg.Netcore.Services.CmsApiProcessorService
 
         private async Task GetAndMapContentItem(IList<IBaseContentItemModel> contentItem, LinkDetails linkDetail)
         {
-            var mappingToUse = contentTypeMappingService.Mappings[linkDetail.ContentType!];
+            var mappingToUse = contentTypeMappingService.GetMapping(linkDetail.ContentType!);
 
-            var pagesApiContentItemModel = GetFromApiCache(mappingToUse, linkDetail.Uri!) ?? AddToApiCache(await GetContentItemAsync(mappingToUse, linkDetail!.Uri!).ConfigureAwait(false));
-
-            if (pagesApiContentItemModel != null)
+            if (mappingToUse != null)
             {
-                mapper.Map(linkDetail, pagesApiContentItemModel);
+                var pagesApiContentItemModel = GetFromApiCache(mappingToUse, linkDetail.Uri!) ?? AddToApiCache(await GetContentItemAsync(mappingToUse, linkDetail!.Uri!).ConfigureAwait(false));
 
-                if (pagesApiContentItemModel.ContentLinks != null)
+                if (pagesApiContentItemModel != null)
                 {
-                    await GetSharedChildContentItems(pagesApiContentItemModel.ContentLinks, pagesApiContentItemModel.ContentItems).ConfigureAwait(false);
-                }
+                    mapper.Map(linkDetail, pagesApiContentItemModel);
 
-                contentItem.Add(pagesApiContentItemModel!);
+                    if (pagesApiContentItemModel.ContentLinks != null)
+                    {
+                        await GetSharedChildContentItems(pagesApiContentItemModel.ContentLinks, pagesApiContentItemModel.ContentItems).ConfigureAwait(false);
+                    }
+
+                    contentItem.Add(pagesApiContentItemModel!);
+                }
             }
         }
 
