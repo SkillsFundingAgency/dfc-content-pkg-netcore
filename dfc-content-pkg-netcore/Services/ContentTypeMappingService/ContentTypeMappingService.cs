@@ -7,6 +7,16 @@ namespace DFC.Content.Pkg.Netcore.Services
     {
         public Dictionary<string, IBaseContentItemModel> Mappings { get; } = new Dictionary<string, IBaseContentItemModel>();
 
+        public IBaseContentItemModel? GetMapping(string contentType)
+        {
+            if (Mappings.ContainsKey(contentType))
+            {
+                return Mappings[contentType];
+            }
+
+            return null;
+        }
+
         public void AddMapping(string contentType, IBaseContentItemModel model)
         {
             if (!Mappings.ContainsKey(contentType))
