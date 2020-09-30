@@ -37,6 +37,8 @@ namespace DFC.Content.Pkg.Netcore.Data.Models
 
         public IList<IBaseContentItemModel> ContentItems { get; set; } = new List<IBaseContentItemModel>();
 
+        public string? ContentType { get; set; }
+
         [JsonIgnore]
         private ContentLinksModel? PrivateLinksModel { get; set; }
     }

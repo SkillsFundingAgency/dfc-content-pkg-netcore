@@ -63,6 +63,8 @@ namespace DFC.Content.Pkg.Netcore.CmsApiProcessorService.UnitTests.Models
 
         public DateTime? CreatedDate { get; set; }
 
+        public string? ContentType { get; set; }
+
         private ContentLinksModel? PrivateLinksModel { get; set; }
     }
 }

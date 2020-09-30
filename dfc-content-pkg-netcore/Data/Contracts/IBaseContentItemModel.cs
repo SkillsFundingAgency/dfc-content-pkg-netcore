@@ -11,5 +11,7 @@ namespace DFC.Content.Pkg.Netcore.Data.Contracts
         IList<IBaseContentItemModel> ContentItems { get; set; }
 
         Guid? ItemId { get; set; }
+
+        string? ContentType { get; set; }
     }
 }
