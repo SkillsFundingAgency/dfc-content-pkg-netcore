@@ -93,6 +93,9 @@ namespace DFC.Content.Pkg.Netcore.CmsApiProcessorService.UnitTests
 
             A.CallTo(() => fakeApiDataProcessorService.GetAsync<ApiItemNoChildrenModel>(A<HttpClient>.Ignored, A<Uri>.Ignored)).Returns(expectedResult);
 
+            var fakeContentTypeMappingService = A.Fake<IContentTypeMappingService>();
+            A.CallTo(() => fakeContentTypeMappingService.IgnoreRelationship).Returns(new List<string>());
+
             var cmsApiService = new CmsApiService(CmsApiClientOptions, fakeApiDataProcessorService, fakeHttpClient, mapper, new ApiCacheService(), A.Fake<IContentTypeMappingService>());
 
             // act
@@ -116,8 +119,8 @@ namespace DFC.Content.Pkg.Netcore.CmsApiProcessorService.UnitTests
             var contentUrl = new Uri("http://www.test.com");
 
             var childContentUrl = new Uri("http://www.testChild.com");
-            var fakeDictionary = new Dictionary<string, IBaseContentItemModel>();
-            fakeDictionary.Add("test", new ApiContentItemModel());
+            var fakeDictionary = new Dictionary<string, Type>();
+            fakeDictionary.Add("test", typeof(ApiContentItemModel));
 
             A.CallTo(() => fakeMappingService.Mappings).Returns(fakeDictionary);
             A.CallTo(() => fakeApiDataProcessorService.GetAsync<ApiItemModel>(A<HttpClient>.Ignored, A<Uri>.Ignored)).Returns(expectedResult);

@@ -94,7 +94,7 @@ namespace DFC.Content.Pkg.Netcore.Services.CmsApiProcessorService
             return null;
         }
 
-        public async Task<TChild?> GetContentItemAsync<TChild>(TChild type, Uri? uri)
+        public async Task<TChild?> GetContentItemAsync<TChild>(Type type, Uri? uri)
              where TChild : class, IBaseContentItemModel
         {
             if (uri != null)
@@ -137,7 +137,9 @@ namespace DFC.Content.Pkg.Netcore.Services.CmsApiProcessorService
 
         private async Task GetSharedChildContentItems(ContentLinksModel? model, IList<IBaseContentItemModel> contentItem)
         {
-            var linkDetails = model?.ContentLinks.SelectMany(contentLink => contentLink.Value);
+            var filteredLinkDetails = model?.ContentLinks?.Where(x => !contentTypeMappingService.IgnoreRelationship.Any(z => z == x.Key));
+
+            var linkDetails = filteredLinkDetails?.SelectMany(contentLink => contentLink.Value);
 
             if (linkDetails != null && linkDetails.Any())
             {
@@ -168,7 +170,7 @@ namespace DFC.Content.Pkg.Netcore.Services.CmsApiProcessorService
 
             if (mappingToUse != null)
             {
-                var pagesApiContentItemModel = GetFromApiCache(mappingToUse, linkDetail.Uri!) ?? AddToApiCache(await GetContentItemAsync(mappingToUse, linkDetail!.Uri!).ConfigureAwait(false));
+                var pagesApiContentItemModel = GetFromApiCache<IBaseContentItemModel>(mappingToUse, linkDetail.Uri!) ?? AddToApiCache(await GetContentItemAsync<IBaseContentItemModel>(mappingToUse!, linkDetail!.Uri!).ConfigureAwait(false));
 
                 if (pagesApiContentItemModel != null)
                 {
@@ -208,10 +210,10 @@ namespace DFC.Content.Pkg.Netcore.Services.CmsApiProcessorService
             return model;
         }
 
-        private TModel? GetFromApiCache<TModel>(TModel type, Uri uri)
+        private TModel? GetFromApiCache<TModel>(Type type, Uri uri)
            where TModel : class, IBaseContentItemModel
         {
-            return apiCacheService.Retrieve(type, uri);
+            return apiCacheService.Retrieve<TModel>(type, uri);
         }
     }
 }

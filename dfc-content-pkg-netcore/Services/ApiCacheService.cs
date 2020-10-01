@@ -43,17 +43,12 @@ namespace DFC.Content.Pkg.Netcore.Services
             return null;
         }
 
-        public TModel? Retrieve<TModel>(TModel? type, Uri id)
+        public TModel? Retrieve<TModel>(Type type, Uri id)
             where TModel : class
         {
-            if (type == null)
-            {
-                throw new ArgumentNullException(nameof(type));
-            }
-
             if (CachedItems.ContainsKey(id))
             {
-                return (TModel?)JsonConvert.DeserializeObject(CachedItems[id], type!.GetType());
+                return (TModel?)JsonConvert.DeserializeObject(CachedItems[id], type);
             }
 
             return null;

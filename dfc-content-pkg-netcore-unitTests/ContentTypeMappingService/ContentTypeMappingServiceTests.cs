@@ -1,5 +1,6 @@
 ﻿using DFC.Content.Pkg.Netcore.ApiProcessorService.UnitTests.Models;
 using DFC.Content.Pkg.Netcore.Services;
+using System.Linq;
 using Xunit;
 
 namespace DFC.Content.Pkg.Netcore.UnitTests
@@ -14,7 +15,7 @@ namespace DFC.Content.Pkg.Netcore.UnitTests
             var serviceToTest = new ContentTypeMappingService();
 
             //Act
-            serviceToTest.AddMapping("foo", new ApiItemModel());
+            serviceToTest.AddMapping("foo", typeof(ApiItemModel));
 
             //Assert
             Assert.Single(serviceToTest.Mappings);
@@ -27,7 +28,7 @@ namespace DFC.Content.Pkg.Netcore.UnitTests
             var serviceToTest = new ContentTypeMappingService();
 
             //Act
-            serviceToTest.AddMapping("foo", new ApiItemModel());
+            serviceToTest.AddMapping("foo", typeof(ApiItemModel));
             serviceToTest.RemoveMapping("foo");
 
             //Assert
@@ -41,11 +42,11 @@ namespace DFC.Content.Pkg.Netcore.UnitTests
             var serviceToTest = new ContentTypeMappingService();
 
             //Act
-            serviceToTest.AddMapping("foo", new ApiItemModel());
+            serviceToTest.AddMapping("foo", typeof(ApiItemModel));
             var result = serviceToTest.GetMapping("foo");
 
             //Assert
-            Assert.IsType<ApiItemModel>(result);
+            Assert.True(result! == typeof(ApiItemModel));
         }
 
         [Fact]
@@ -55,11 +56,38 @@ namespace DFC.Content.Pkg.Netcore.UnitTests
             var serviceToTest = new ContentTypeMappingService();
 
             //Act
-            serviceToTest.AddMapping("foo", new ApiItemModel());
+            serviceToTest.AddMapping("foo", typeof(ApiItemModel));
             var result = serviceToTest.GetMapping("bar");
 
             //Assert
             Assert.Null(result);
+        }
+
+        [Fact]
+        public void ContentTypeMappingServiceAddIgnoreRelationshipAddsIgnore()
+        {
+            //Arrange
+            var serviceToTest = new ContentTypeMappingService();
+
+            //Act
+            serviceToTest.AddIgnoreRelationship("foo");
+
+            //Assert
+            Assert.Single(serviceToTest.IgnoreRelationship);
+        }
+
+        [Fact]
+        public void ContentTypeMappingServiceAddIgnoreRelationshipRemovesIgnore()
+        {
+            //Arrange
+            var serviceToTest = new ContentTypeMappingService();
+
+            //Act
+            serviceToTest.AddIgnoreRelationship("foo");
+            serviceToTest.RemoveIgnoreRelationship("foo");
+
+            //Assert
+            Assert.Empty(serviceToTest.IgnoreRelationship);
         }
     }
 }
