@@ -14,7 +14,7 @@ namespace DFC.Content.Pkg.Netcore.UnitTests
             var serviceToTest = new ContentTypeMappingService();
 
             //Act
-            serviceToTest.AddMapping("foo", new ApiItemModel());
+            serviceToTest.AddMapping("foo", typeof(ApiItemModel));
 
             //Assert
             Assert.Single(serviceToTest.Mappings);
@@ -27,7 +27,7 @@ namespace DFC.Content.Pkg.Netcore.UnitTests
             var serviceToTest = new ContentTypeMappingService();
 
             //Act
-            serviceToTest.AddMapping("foo", new ApiItemModel());
+            serviceToTest.AddMapping("foo", typeof(ApiItemModel));
             serviceToTest.RemoveMapping("foo");
 
             //Assert
@@ -41,11 +41,11 @@ namespace DFC.Content.Pkg.Netcore.UnitTests
             var serviceToTest = new ContentTypeMappingService();
 
             //Act
-            serviceToTest.AddMapping("foo", new ApiItemModel());
+            serviceToTest.AddMapping("foo", typeof(ApiItemModel));
             var result = serviceToTest.GetMapping("foo");
 
             //Assert
-            Assert.IsType<ApiItemModel>(result);
+            Assert.True(result! == typeof(ApiItemModel));
         }
 
         [Fact]
@@ -55,7 +55,7 @@ namespace DFC.Content.Pkg.Netcore.UnitTests
             var serviceToTest = new ContentTypeMappingService();
 
             //Act
-            serviceToTest.AddMapping("foo", new ApiItemModel());
+            serviceToTest.AddMapping("foo", typeof(ApiItemModel));
             var result = serviceToTest.GetMapping("bar");
 
             //Assert

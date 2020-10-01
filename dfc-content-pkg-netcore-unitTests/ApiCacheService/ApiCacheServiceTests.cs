@@ -1,4 +1,5 @@
 ﻿using DFC.Content.Pkg.Netcore.ApiProcessorService.UnitTests.Models;
+using DFC.Content.Pkg.Netcore.Data.Contracts;
 using DFC.Content.Pkg.Netcore.Services;
 using System;
 using Xunit;
@@ -90,7 +91,7 @@ namespace DFC.Content.Pkg.Netcore.UnitTests
             var itemToCache = new ApiItemModel() { Description = "a test item" };
             //Act
             serviceToTest.AddOrUpdate(new Uri("http://somewhere.com/aresource"), itemToCache);
-            var result = serviceToTest.Retrieve(itemToCache, new Uri("http://somewhere.com/aresource"));
+            var result = serviceToTest.Retrieve<ApiItemModel>(itemToCache.GetType(), new Uri("http://somewhere.com/aresource"));
 
             //Assert
             Assert.Equal(1, serviceToTest.Count);
@@ -105,24 +106,11 @@ namespace DFC.Content.Pkg.Netcore.UnitTests
             var itemToCache = new ApiItemModel() { Description = "a test item" };
             //Act
             serviceToTest.AddOrUpdate(new Uri("http://somewhere.com/aresource"), itemToCache);
-            var result = serviceToTest.Retrieve(itemToCache, new Uri("http://somewhere.com/aresource1"));
+            var result = serviceToTest.Retrieve<IBaseContentItemModel>(itemToCache.GetType(), new Uri("http://somewhere.com/aresource1"));
 
             //Assert
             Assert.Equal(1, serviceToTest.Count);
             Assert.Null(result);
-        }
-
-        [Fact]
-        public void ApiCacheServiceRetrieveByNullTypeThrowsException()
-        {
-            //Arrange
-            var serviceToTest = new ApiCacheService();
-            ApiItemModel? itemToCache = null;
-
-            //Act
-            //Assert
-            serviceToTest.AddOrUpdate(new Uri("http://somewhere.com/aresource"), itemToCache!);
-            Assert.Throws<ArgumentNullException>(() => itemToCache = serviceToTest.Retrieve(itemToCache, new Uri("http://somewhere.com/aresource")));
         }
     }
 }

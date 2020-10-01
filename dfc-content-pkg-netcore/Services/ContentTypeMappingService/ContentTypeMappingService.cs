@@ -1,13 +1,14 @@
 ﻿using DFC.Content.Pkg.Netcore.Data.Contracts;
+using System;
 using System.Collections.Generic;
 
 namespace DFC.Content.Pkg.Netcore.Services
 {
     public class ContentTypeMappingService : IContentTypeMappingService
     {
-        public Dictionary<string, IBaseContentItemModel> Mappings { get; } = new Dictionary<string, IBaseContentItemModel>();
+        public Dictionary<string, Type> Mappings { get; } = new Dictionary<string, Type>();
 
-        public IBaseContentItemModel? GetMapping(string contentType)
+        public Type? GetMapping(string contentType)
         {
             if (Mappings.ContainsKey(contentType))
             {
@@ -17,7 +18,7 @@ namespace DFC.Content.Pkg.Netcore.Services
             return null;
         }
 
-        public void AddMapping(string contentType, IBaseContentItemModel model)
+        public void AddMapping(string contentType, Type model)
         {
             if (!Mappings.ContainsKey(contentType))
             {

@@ -116,8 +116,8 @@ namespace DFC.Content.Pkg.Netcore.CmsApiProcessorService.UnitTests
             var contentUrl = new Uri("http://www.test.com");
 
             var childContentUrl = new Uri("http://www.testChild.com");
-            var fakeDictionary = new Dictionary<string, IBaseContentItemModel>();
-            fakeDictionary.Add("test", new ApiContentItemModel());
+            var fakeDictionary = new Dictionary<string, Type>();
+            fakeDictionary.Add("test", typeof(ApiContentItemModel));
 
             A.CallTo(() => fakeMappingService.Mappings).Returns(fakeDictionary);
             A.CallTo(() => fakeApiDataProcessorService.GetAsync<ApiItemModel>(A<HttpClient>.Ignored, A<Uri>.Ignored)).Returns(expectedResult);

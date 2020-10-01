@@ -15,7 +15,7 @@ namespace DFC.Content.Pkg.Netcore.Data.Contracts
         TModel? Retrieve<TModel>(Uri id)
             where TModel : class;
 
-        TModel? Retrieve<TModel>(TModel type, Uri id)
+        TModel? Retrieve<TModel>(Type type, Uri id)
             where TModel : class;
     }
 }
