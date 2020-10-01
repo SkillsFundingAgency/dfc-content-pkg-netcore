@@ -8,6 +8,21 @@ namespace DFC.Content.Pkg.Netcore.Services
     {
         public Dictionary<string, Type> Mappings { get; } = new Dictionary<string, Type>();
 
+        public List<string> IgnoreRelationship { get; } = new List<string>();
+
+        public void AddIgnoreRelationship(string relationshipName)
+        {
+            if (!IgnoreRelationship.Contains(relationshipName))
+            {
+                IgnoreRelationship.Add(relationshipName);
+            }
+        }
+
+        public void RemoveIgnoreRelationship(string relationshipName)
+        {
+            IgnoreRelationship.Remove(relationshipName);
+        }
+
         public Type? GetMapping(string contentType)
         {
             if (Mappings.ContainsKey(contentType))

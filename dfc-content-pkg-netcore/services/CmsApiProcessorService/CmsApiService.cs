@@ -137,7 +137,9 @@ namespace DFC.Content.Pkg.Netcore.Services.CmsApiProcessorService
 
         private async Task GetSharedChildContentItems(ContentLinksModel? model, IList<IBaseContentItemModel> contentItem)
         {
-            var linkDetails = model?.ContentLinks.SelectMany(contentLink => contentLink.Value);
+            var filteredLinkDetails = model?.ContentLinks?.Where(x => !contentTypeMappingService.IgnoreRelationship.Any(z => z == x.Key));
+
+            var linkDetails = filteredLinkDetails?.SelectMany(contentLink => contentLink.Value);
 
             if (linkDetails != null && linkDetails.Any())
             {

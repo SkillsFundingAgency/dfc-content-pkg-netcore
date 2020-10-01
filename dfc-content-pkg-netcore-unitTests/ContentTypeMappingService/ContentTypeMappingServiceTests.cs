@@ -1,5 +1,6 @@
 ﻿using DFC.Content.Pkg.Netcore.ApiProcessorService.UnitTests.Models;
 using DFC.Content.Pkg.Netcore.Services;
+using System.Linq;
 using Xunit;
 
 namespace DFC.Content.Pkg.Netcore.UnitTests
@@ -60,6 +61,33 @@ namespace DFC.Content.Pkg.Netcore.UnitTests
 
             //Assert
             Assert.Null(result);
+        }
+
+        [Fact]
+        public void ContentTypeMappingServiceAddIgnoreRelationshipAddsIgnore()
+        {
+            //Arrange
+            var serviceToTest = new ContentTypeMappingService();
+
+            //Act
+            serviceToTest.AddIgnoreRelationship("foo");
+
+            //Assert
+            Assert.Single(serviceToTest.IgnoreRelationship);
+        }
+
+        [Fact]
+        public void ContentTypeMappingServiceAddIgnoreRelationshipRemovesIgnore()
+        {
+            //Arrange
+            var serviceToTest = new ContentTypeMappingService();
+
+            //Act
+            serviceToTest.AddIgnoreRelationship("foo");
+            serviceToTest.RemoveIgnoreRelationship("foo");
+
+            //Assert
+            Assert.Empty(serviceToTest.IgnoreRelationship);
         }
     }
 }
