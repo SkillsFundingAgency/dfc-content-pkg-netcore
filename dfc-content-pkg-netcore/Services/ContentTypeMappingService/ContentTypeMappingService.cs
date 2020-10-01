@@ -12,22 +12,28 @@ namespace DFC.Content.Pkg.Netcore.Services
 
         public void AddIgnoreRelationship(string relationshipName)
         {
-            if (!IgnoreRelationship.Contains(relationshipName))
+            _ = relationshipName ?? throw new ArgumentNullException(nameof(relationshipName));
+
+            if (!IgnoreRelationship.Contains(relationshipName.ToUpperInvariant()))
             {
-                IgnoreRelationship.Add(relationshipName);
+                IgnoreRelationship.Add(relationshipName.ToUpperInvariant());
             }
         }
 
         public void RemoveIgnoreRelationship(string relationshipName)
         {
-            IgnoreRelationship.Remove(relationshipName);
+            _ = relationshipName ?? throw new ArgumentNullException(nameof(relationshipName));
+
+            IgnoreRelationship.Remove(relationshipName.ToUpperInvariant());
         }
 
         public Type? GetMapping(string contentType)
         {
-            if (Mappings.ContainsKey(contentType))
+            _ = contentType ?? throw new ArgumentNullException(nameof(contentType));
+
+            if (Mappings.ContainsKey(contentType!.ToUpperInvariant()))
             {
-                return Mappings[contentType];
+                return Mappings[contentType!.ToUpperInvariant()];
             }
 
             return null;
@@ -35,19 +41,23 @@ namespace DFC.Content.Pkg.Netcore.Services
 
         public void AddMapping(string contentType, Type model)
         {
-            if (!Mappings.ContainsKey(contentType))
+            _ = contentType ?? throw new ArgumentNullException(nameof(contentType));
+
+            if (!Mappings.ContainsKey(contentType.ToUpperInvariant()))
             {
-                Mappings.Add(contentType, model);
+                Mappings.Add(contentType.ToUpperInvariant(), model);
             }
 
-            Mappings[contentType] = model;
+            Mappings[contentType.ToUpperInvariant()] = model;
         }
 
         public void RemoveMapping(string contentType)
         {
-            if (Mappings.ContainsKey(contentType))
+            _ = contentType ?? throw new ArgumentNullException(nameof(contentType));
+
+            if (Mappings.ContainsKey(contentType.ToUpperInvariant()))
             {
-                Mappings.Remove(contentType);
+                Mappings.Remove(contentType.ToUpperInvariant());
             }
         }
     }
