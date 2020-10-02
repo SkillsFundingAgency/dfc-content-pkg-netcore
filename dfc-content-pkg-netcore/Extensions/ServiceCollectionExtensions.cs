@@ -27,7 +27,7 @@ namespace DFC.Content.Pkg.Netcore.Extensions
             services.AddTransient<IApiDataProcessorService, ApiDataProcessorService>();
             services.AddSingleton<IApiCacheService, ApiCacheService>();
             services.AddSingleton<IContentTypeMappingService, ContentTypeMappingService>();
-            services.AddTransient<IContentCacheService, ContentCacheService>();
+            services.AddSingleton<IContentCacheService, ContentCacheService>();
 
             const string AppSettingsPolicies = "Policies";
             var policyOptions = configuration.GetSection(AppSettingsPolicies).Get<PolicyOptions>() ?? new PolicyOptions();
