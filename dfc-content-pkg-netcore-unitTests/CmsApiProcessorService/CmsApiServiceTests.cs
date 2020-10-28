@@ -119,8 +119,10 @@ namespace DFC.Content.Pkg.Netcore.CmsApiProcessorService.UnitTests
             var contentUrl = new Uri("http://www.test.com");
 
             var childContentUrl = new Uri("http://www.testChild.com");
-            var fakeDictionary = new Dictionary<string, Type>();
-            fakeDictionary.Add("test", typeof(ApiContentItemModel));
+            var fakeDictionary = new Dictionary<string, Type>
+            {
+                { "test", typeof(ApiContentItemModel) },
+            };
 
             A.CallTo(() => fakeMappingService.Mappings).Returns(fakeDictionary);
             A.CallTo(() => fakeApiDataProcessorService.GetAsync<ApiItemModel>(A<HttpClient>.Ignored, A<Uri>.Ignored)).Returns(expectedResult);
@@ -137,7 +139,7 @@ namespace DFC.Content.Pkg.Netcore.CmsApiProcessorService.UnitTests
                             new LinkDetails
                             {
                                 Uri = contentUrl,
-                                ContentType = "test"
+                                ContentType = "test",
                             },
                         }),
                 },
@@ -153,7 +155,7 @@ namespace DFC.Content.Pkg.Netcore.CmsApiProcessorService.UnitTests
                             new LinkDetails
                             {
                                 Uri = new Uri("http://www.testChild.com"),
-                                ContentType = "test"
+                                ContentType = "test",
                             },
                         }),
                 },
@@ -170,6 +172,7 @@ namespace DFC.Content.Pkg.Netcore.CmsApiProcessorService.UnitTests
                 expectedItemResult.ContentLinks.ContentLinks.SelectMany(contentLink => contentLink.Value).Count();
 
             A.CallTo(() => fakeApiDataProcessorService.GetAsync<ApiItemModel>(A<HttpClient>.Ignored, A<Uri>.Ignored)).MustHaveHappenedOnceExactly();
+
             // Account for cache hit on child item
             A.CallTo(() => fakeApiDataProcessorService.GetAsync<ApiItemModel>(A<HttpClient>.Ignored, A<Uri>.Ignored)).MustHaveHappened(expectedCount - 1, Times.Exactly);
             A.Equals(result, expectedResult);
@@ -249,7 +252,6 @@ namespace DFC.Content.Pkg.Netcore.CmsApiProcessorService.UnitTests
             // assert
             A.Equals(result, null);
         }
-
 
         [Fact]
         public async Task CmsApiServiceGetContentItemReturnsNullWhenKnowledgePassed()

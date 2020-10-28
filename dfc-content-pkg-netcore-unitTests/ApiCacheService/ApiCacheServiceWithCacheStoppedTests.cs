@@ -6,27 +6,27 @@ using Xunit;
 
 namespace DFC.Content.Pkg.Netcore.UnitTests
 {
-    [Trait("Category", "Api Cache Service Unit Tests")]
-    public class ApiCacheServiceTests
+    [Trait("Category", "Api Cache Service (with cache stopped) Unit Tests")]
+    public class ApiCacheServiceWithCacheStoppedTests
     {
         [Fact]
         public void ApiCacheServiceAddOrUpdateAddsItem()
         {
             //Arrange
-            var serviceToTest = new ApiCacheService();
+            var serviceToTest = BuildApiCacheService();
 
             //Act
             serviceToTest.AddOrUpdate(new Uri("http://somewhere.com/aresource"), new ApiItemModel());
 
             //Assert
-            Assert.Equal(1, serviceToTest.Count);
+            Assert.Equal(0, serviceToTest.Count);
         }
 
         [Fact]
         public void ApiCacheServiceAddOrUpdateUpdatesItem()
         {
             //Arrange
-            var serviceToTest = new ApiCacheService();
+            var serviceToTest = BuildApiCacheService();
             var itemToCache = new ApiItemModel() { Description = "a test item" };
 
             //Act
@@ -35,15 +35,15 @@ namespace DFC.Content.Pkg.Netcore.UnitTests
             var result = serviceToTest.Retrieve<ApiItemModel>(new Uri("http://somewhere.com/aresource"));
 
             //Assert
-            Assert.Equal(1, serviceToTest.Count);
-            Assert.Equal(itemToCache.Description, result!.Description);
+            Assert.Equal(0, serviceToTest.Count);
+            Assert.Null(result);
         }
 
         [Fact]
         public void ApiCacheServiceClearClearsItems()
         {
             //Arrange
-            var serviceToTest = new ApiCacheService();
+            var serviceToTest = BuildApiCacheService();
 
             //Act
             serviceToTest.AddOrUpdate(new Uri("http://somewhere.com/aresource"), new ApiItemModel());
@@ -57,7 +57,7 @@ namespace DFC.Content.Pkg.Netcore.UnitTests
         public void ApiCacheServiceRemoveRemovesItem()
         {
             //Arrange
-            var serviceToTest = new ApiCacheService();
+            var serviceToTest = BuildApiCacheService();
 
             //Act
             serviceToTest.AddOrUpdate(new Uri("http://somewhere.com/aresource"), new ApiItemModel());
@@ -71,46 +71,57 @@ namespace DFC.Content.Pkg.Netcore.UnitTests
         public void ApiCacheServiceRetrieveRetrievesItem()
         {
             //Arrange
-            var serviceToTest = new ApiCacheService();
+            var serviceToTest = BuildApiCacheService();
             var itemToCache = new ApiItemModel() { Description = "a test item" };
+
             //Act
             serviceToTest.AddOrUpdate(new Uri("http://somewhere.com/aresource"), itemToCache);
             var result = serviceToTest.Retrieve<ApiItemModel>(new Uri("http://somewhere.com/aresource"));
 
             //Assert
-            Assert.Equal(1, serviceToTest.Count);
-            Assert.Equal(itemToCache.Description, result!.Description);
+            Assert.Equal(0, serviceToTest.Count);
+            Assert.Null(result);
         }
-
 
         [Fact]
         public void ApiCacheServiceRetrieveByTypeRetrievesItem()
         {
             //Arrange
-            var serviceToTest = new ApiCacheService();
+            var serviceToTest = BuildApiCacheService();
             var itemToCache = new ApiItemModel() { Description = "a test item" };
+
             //Act
             serviceToTest.AddOrUpdate(new Uri("http://somewhere.com/aresource"), itemToCache);
             var result = serviceToTest.Retrieve<ApiItemModel>(itemToCache.GetType(), new Uri("http://somewhere.com/aresource"));
 
             //Assert
-            Assert.Equal(1, serviceToTest.Count);
-            Assert.Equal(itemToCache.Description, result!.Description);
+            Assert.Equal(0, serviceToTest.Count);
+            Assert.Null(result);
         }
 
         [Fact]
         public void ApiCacheServiceRetrieveByTypeReturnsNullItem()
         {
             //Arrange
-            var serviceToTest = new ApiCacheService();
+            var serviceToTest = BuildApiCacheService();
             var itemToCache = new ApiItemModel() { Description = "a test item" };
+
             //Act
             serviceToTest.AddOrUpdate(new Uri("http://somewhere.com/aresource"), itemToCache);
             var result = serviceToTest.Retrieve<IBaseContentItemModel>(itemToCache.GetType(), new Uri("http://somewhere.com/aresource1"));
 
             //Assert
-            Assert.Equal(1, serviceToTest.Count);
+            Assert.Equal(0, serviceToTest.Count);
             Assert.Null(result);
+        }
+
+        private ApiCacheService BuildApiCacheService()
+        {
+            var serviceTotest = new ApiCacheService();
+
+            serviceTotest.StopCache();
+
+            return serviceTotest;
         }
     }
 }
