@@ -10,6 +10,10 @@ namespace DFC.Content.Pkg.Netcore.Data.Contracts
 
         void Clear();
 
+        void StartCache();
+
+        void StopCache();
+
         void Remove(Uri id);
 
         TModel? Retrieve<TModel>(Uri id)
