@@ -164,7 +164,7 @@ namespace DFC.Content.Pkg.Netcore.Services.CmsApiProcessorService
             }
         }
 
-        private async Task GetAndMapContentItem(IList<IBaseContentItemModel> contentItem, LinkDetails linkDetail)
+        private async Task GetAndMapContentItem(IList<IBaseContentItemModel> contentItem, ILinkDetails linkDetail)
         {
             var mappingToUse = contentTypeMappingService.GetMapping(linkDetail.ContentType!);
 

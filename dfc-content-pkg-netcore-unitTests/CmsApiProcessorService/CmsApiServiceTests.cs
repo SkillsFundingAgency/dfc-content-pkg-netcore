@@ -130,11 +130,11 @@ namespace DFC.Content.Pkg.Netcore.CmsApiProcessorService.UnitTests
             A.CallTo(() => fakeApiDataProcessorService.GetAsync<ApiContentItemModel>(A<HttpClient>.Ignored, childContentUrl)).Returns(new ApiContentItemModel());
             expectedResult.ContentLinks = new ContentLinksModel(new JObject())
             {
-                ContentLinks = new List<KeyValuePair<string, List<LinkDetails>>>()
+                ContentLinks = new List<KeyValuePair<string, List<ILinkDetails>>>()
                 {
-                    new KeyValuePair<string, List<LinkDetails>>(
+                    new KeyValuePair<string, List<ILinkDetails>>(
                         "test",
-                        new List<LinkDetails>
+                        new List<ILinkDetails>
                         {
                             new LinkDetails
                             {
@@ -146,11 +146,11 @@ namespace DFC.Content.Pkg.Netcore.CmsApiProcessorService.UnitTests
             };
             expectedItemResult.ContentLinks = new ContentLinksModel(new JObject())
             {
-                ContentLinks = new List<KeyValuePair<string, List<LinkDetails>>>()
+                ContentLinks = new List<KeyValuePair<string, List<ILinkDetails>>>()
                 {
-                    new KeyValuePair<string, List<LinkDetails>>(
+                    new KeyValuePair<string, List<ILinkDetails>>(
                         "Child",
-                        new List<LinkDetails>
+                        new List<ILinkDetails>
                         {
                             new LinkDetails
                             {

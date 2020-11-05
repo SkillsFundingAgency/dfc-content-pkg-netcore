@@ -1,11 +1,12 @@
-﻿using System;
+﻿using DFC.Content.Pkg.Netcore.Data.Contracts;
+using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Text.Json.Serialization;
 
 namespace DFC.Content.Pkg.Netcore.Data.Models
 {
     [ExcludeFromCodeCoverage]
-    public class LinkDetails
+    public class LinkDetails : ILinkDetails
     {
         [JsonIgnore]
         public Uri? Uri { get; set; }
