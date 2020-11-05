@@ -1,11 +1,12 @@
 ﻿using DFC.Content.Pkg.Netcore.Data.Contracts;
 using DFC.Content.Pkg.Netcore.Data.Models;
 using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 using System;
+using System.Diagnostics.CodeAnalysis;
 
 namespace DFC.Content.Pkg.Netcore.Converters
 {
+    [ExcludeFromCodeCoverage]
     public class LinkDetailConverter : JsonConverter
     {
         public override bool CanWrite => false;
@@ -17,14 +18,18 @@ namespace DFC.Content.Pkg.Netcore.Converters
             return objectType == typeof(ILinkDetails);
         }
 
-        public override void WriteJson(JsonWriter writer,
-            object value, JsonSerializer serializer)
+        public override void WriteJson(
+            JsonWriter writer,
+            object? value,
+            JsonSerializer serializer)
         {
             throw new InvalidOperationException("Use default serialization.");
         }
 
-        public override object ReadJson(JsonReader? reader,
-            Type objectType, object? existingValue,
+        public override object ReadJson(
+            JsonReader? reader,
+            Type objectType, 
+            object? existingValue,
             JsonSerializer serializer)
         {
             if (reader == null)
