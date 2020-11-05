@@ -1,4 +1,5 @@
-﻿using DFC.Content.Pkg.Netcore.Data.Contracts;
+﻿using DFC.Content.Pkg.Netcore.Converters;
+using DFC.Content.Pkg.Netcore.Data.Contracts;
 using DFC.Content.Pkg.Netcore.Data.Models.ClientOptions;
 using DFC.Content.Pkg.Netcore.Data.Models.PollyOptions;
 using DFC.Content.Pkg.Netcore.Services;
@@ -7,10 +8,12 @@ using DFC.Content.Pkg.Netcore.Services.CmsApiProcessorService;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
+using Newtonsoft.Json;
 using Polly;
 using Polly.Extensions.Http;
 using Polly.Registry;
 using System;
+using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Net.Http;
 
@@ -35,6 +38,23 @@ namespace DFC.Content.Pkg.Netcore.Extensions
             services
                 .AddPolicies(policyRegistry, nameof(CmsApiClientOptions), policyOptions)
                 .AddHttpClient<ICmsApiService, CmsApiService, CmsApiClientOptions>(configuration, nameof(CmsApiClientOptions), nameof(PolicyOptions.HttpRetry), nameof(PolicyOptions.HttpCircuitBreaker));
+
+            JsonConvert.DefaultSettings = () => new JsonSerializerSettings
+            {
+                Converters = new List<JsonConverter> { new LinkDetailConverter() },
+            };
+
+            services.AddLinkDetailsConverter(new LinkDetailConverter());
+
+            return services;
+        }
+
+        public static IServiceCollection AddLinkDetailsConverter(this IServiceCollection services, JsonConverter converter)
+        {
+            JsonConvert.DefaultSettings = () => new JsonSerializerSettings
+            {
+                Converters = new List<JsonConverter> { converter },
+            };
 
             return services;
         }

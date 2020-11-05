@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json;
+﻿using DFC.Content.Pkg.Netcore.Data.Contracts;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
@@ -17,7 +18,7 @@ namespace DFC.Content.Pkg.Netcore.Data.Models
             this.jLinks = jLinks;
         }
 
-        public List<KeyValuePair<string, List<LinkDetails>>> ContentLinks
+        public List<KeyValuePair<string, List<ILinkDetails>>> ContentLinks
         {
             get => LinksPrivate ??= GetLinksFromJObject();
 
@@ -26,7 +27,7 @@ namespace DFC.Content.Pkg.Netcore.Data.Models
 
         public bool ExcludePageLocation { get; set; }
 
-        private List<KeyValuePair<string, List<LinkDetails>>>? LinksPrivate { get; set; }
+        private List<KeyValuePair<string, List<ILinkDetails>>>? LinksPrivate { get; set; }
 
         private static CuriesDetails? GetContentCuriesDetails(JObject links)
         {
@@ -42,21 +43,21 @@ namespace DFC.Content.Pkg.Netcore.Data.Models
             return curiesList.FirstOrDefault();
         }
 
-        private static KeyValuePair<string, List<LinkDetails>> GetLinkDetailsFromArray(JToken array, string relationshipKey, string? baseHref)
+        private static KeyValuePair<string, List<ILinkDetails>> GetLinkDetailsFromArray(JToken array, string relationshipKey, string? baseHref)
         {
-            var links = JsonConvert.DeserializeObject<List<LinkDetails>>(array.ToString());
+            var links = JsonConvert.DeserializeObject<List<ILinkDetails>>(array.ToString());
 
             foreach (var link in links)
             {
                 link.Uri = new Uri($"{baseHref}{link.Href}");
             }
 
-            return new KeyValuePair<string, List<LinkDetails>>(relationshipKey, links);
+            return new KeyValuePair<string, List<ILinkDetails>>(relationshipKey, links);
         }
 
-        private List<KeyValuePair<string, List<LinkDetails>>> GetLinksFromJObject()
+        private List<KeyValuePair<string, List<ILinkDetails>>> GetLinksFromJObject()
         {
-            var contLink = new List<KeyValuePair<string, List<LinkDetails>>>();
+            var contLink = new List<KeyValuePair<string, List<ILinkDetails>>>();
 
             if (jLinks == null)
             {
@@ -95,12 +96,12 @@ namespace DFC.Content.Pkg.Netcore.Data.Models
                 }
                 else
                 {
-                    var child = JsonConvert.DeserializeObject<LinkDetails>(value.ToString());
+                    var child = JsonConvert.DeserializeObject<ILinkDetails>(value.ToString());
                     child.Uri = new Uri($"{contentCuriesDetails.Href}{child.Href}");
 
-                    contLink.Add(new KeyValuePair<string, List<LinkDetails>>(
+                    contLink.Add(new KeyValuePair<string, List<ILinkDetails>>(
                         relationShipKey,
-                        new List<LinkDetails>
+                        new List<ILinkDetails>
                         {
                             child,
                         }));
