@@ -18,7 +18,6 @@
 	
 	<ItemGroup>
     <PackageReference Include="AutoMapper" Version="9.0.0" />
-    <PackageReference Include="FluentNHibernate" Version="2.1.2" />
     <PackageReference Include="Microsoft.Azure.Management.EventGrid" Version="6.0.0" />
 	  <PackageReference Include="Microsoft.CodeAnalysis.FxCopAnalyzers" Version="3.3.0">
 		  <PrivateAssets>all</PrivateAssets>
