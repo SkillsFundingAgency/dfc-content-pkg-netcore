@@ -28,7 +28,7 @@ namespace DFC.Content.Pkg.Netcore.Converters
 
         public override object ReadJson(
             JsonReader? reader,
-            Type objectType, 
+            Type objectType,
             object? existingValue,
             JsonSerializer serializer)
         {

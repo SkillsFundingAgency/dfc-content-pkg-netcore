@@ -4,6 +4,7 @@ using Newtonsoft.Json;
 using System;
 using System.Net;
 using System.Net.Http;
+using System.Net.Http.Headers;
 using System.Net.Mime;
 using System.Text;
 using System.Threading.Tasks;
@@ -28,7 +29,7 @@ namespace DFC.Content.Pkg.Netcore.Services.ApiProcessorService
             using var request = new HttpRequestMessage(HttpMethod.Get, url);
 
             request.Headers.Accept.Clear();
-            request.Headers.Accept.Add(new System.Net.Http.Headers.MediaTypeWithQualityHeaderValue(acceptHeader));
+            request.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue(acceptHeader));
 
             try
             {
@@ -40,7 +41,7 @@ namespace DFC.Content.Pkg.Netcore.Services.ApiProcessorService
                     logger.LogError($"Failed to get {acceptHeader} data from {url}, received error : '{responseString}', returning empty content.");
                     responseString = null;
                 }
-                else if (response.StatusCode != System.Net.HttpStatusCode.OK)
+                else if (response.StatusCode != HttpStatusCode.OK)
                 {
                     logger.LogInformation($"Status - {response.StatusCode} with response '{responseString}' received from {url}, returning empty content.");
                     responseString = null;
