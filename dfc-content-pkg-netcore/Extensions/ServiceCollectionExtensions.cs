@@ -7,7 +7,6 @@ using DFC.Content.Pkg.Netcore.Services.ApiProcessorService;
 using DFC.Content.Pkg.Netcore.Services.CmsApiProcessorService;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using Polly;
 using Polly.Extensions.Http;
@@ -26,6 +25,8 @@ namespace DFC.Content.Pkg.Netcore.Extensions
         {
             _ = configuration ?? throw new ArgumentNullException(nameof(configuration));
 
+            services.AddSingleton(configuration.GetSection(nameof(CmsApiClientOptions)).Get<CmsApiClientOptions>() ?? new CmsApiClientOptions());
+
             services.AddTransient<IApiService, ApiService>();
             services.AddTransient<IApiDataProcessorService, ApiDataProcessorService>();
             services.AddSingleton<IApiCacheService, ApiCacheService>();
@@ -37,7 +38,7 @@ namespace DFC.Content.Pkg.Netcore.Extensions
 
             services
                 .AddPolicies(policyRegistry, nameof(CmsApiClientOptions), policyOptions)
-                .AddHttpClient<ICmsApiService, CmsApiService, CmsApiClientOptions>(configuration, nameof(CmsApiClientOptions), nameof(PolicyOptions.HttpRetry), nameof(PolicyOptions.HttpCircuitBreaker));
+                .AddHttpClient<ICmsApiService, CmsApiService, CmsApiClientOptions>(nameof(CmsApiClientOptions), nameof(PolicyOptions.HttpRetry), nameof(PolicyOptions.HttpCircuitBreaker));
 
             JsonConvert.DefaultSettings = () => new JsonSerializerSettings
             {
@@ -71,6 +72,8 @@ namespace DFC.Content.Pkg.Netcore.Extensions
                 $"{keyPrefix}_{nameof(PolicyOptions.HttpRetry)}",
                 HttpPolicyExtensions
                     .HandleTransientHttpError()
+                    .OrResult(msg => msg.StatusCode == System.Net.HttpStatusCode.TooManyRequests)
+                    .OrResult(r => r?.Headers?.RetryAfter != null)
                     .WaitAndRetryAsync(
                         policyOptions.HttpRetry.Count,
                         retryAttempt => TimeSpan.FromSeconds(Math.Pow(policyOptions.HttpRetry.BackoffPower, retryAttempt))));
@@ -88,7 +91,6 @@ namespace DFC.Content.Pkg.Netcore.Extensions
 
         public static IServiceCollection AddHttpClient<TClient, TImplementation, TClientOptions>(
                     this IServiceCollection services,
-                    IConfiguration configuration,
                     string configurationSectionName,
                     string retryPolicyName,
                     string circuitBreakerPolicyName)
@@ -97,28 +99,25 @@ namespace DFC.Content.Pkg.Netcore.Extensions
                     where TClientOptions : ClientOptionsModel, new()
         {
             return services
-.Configure<TClientOptions>(options => configuration?.GetSection(configurationSectionName))
-.AddHttpClient<TClient, TImplementation>()
-.ConfigureHttpClient((sp, options) =>
-{
-    var httpClientOptions = sp
-    .GetRequiredService<IOptions<TClientOptions>>()
-    .Value;
-    options.BaseAddress = httpClientOptions.BaseAddress;
-    options.Timeout = httpClientOptions.Timeout;
+                .AddHttpClient<TClient, TImplementation>()
+                .ConfigureHttpClient((sp, options) =>
+                {
+                    var httpClientOptions = sp.GetRequiredService<TClientOptions>();
+                    options.BaseAddress = httpClientOptions.BaseAddress;
+                    options.Timeout = httpClientOptions.Timeout;
 
-    if (!string.IsNullOrWhiteSpace(httpClientOptions.ApiKey))
-    {
-        options.DefaultRequestHeaders.Add("Ocp-Apim-Subscription-Key", httpClientOptions.ApiKey);
-    }
-})
-.ConfigurePrimaryHttpMessageHandler(() => new HttpClientHandler()
-{
-    AllowAutoRedirect = false,
-})
-.AddPolicyHandlerFromRegistry($"{configurationSectionName}_{retryPolicyName}")
-.AddPolicyHandlerFromRegistry($"{configurationSectionName}_{circuitBreakerPolicyName}")
-.Services;
+                    if (!string.IsNullOrWhiteSpace(httpClientOptions.ApiKey))
+                    {
+                        options.DefaultRequestHeaders.Add("Ocp-Apim-Subscription-Key", httpClientOptions.ApiKey);
+                    }
+                })
+                .ConfigurePrimaryHttpMessageHandler(() => new HttpClientHandler()
+                {
+                    AllowAutoRedirect = false,
+                })
+                .AddPolicyHandlerFromRegistry($"{configurationSectionName}_{retryPolicyName}")
+                .AddPolicyHandlerFromRegistry($"{configurationSectionName}_{circuitBreakerPolicyName}")
+                .Services;
         }
     }
 }
