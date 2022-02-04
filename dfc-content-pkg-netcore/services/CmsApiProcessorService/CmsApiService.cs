@@ -4,6 +4,7 @@ using DFC.Content.Pkg.Netcore.Data.Models;
 using DFC.Content.Pkg.Netcore.Data.Models.ClientOptions;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
@@ -15,7 +16,7 @@ namespace DFC.Content.Pkg.Netcore.Services.CmsApiProcessorService
         private readonly CmsApiClientOptions cmsApiClientOptions;
         private readonly IApiDataProcessorService apiDataProcessorService;
         private readonly HttpClient httpClient;
-        private readonly AutoMapper.IMapper mapper;
+        private readonly IMapper mapper;
         private readonly IApiCacheService apiCacheService;
         private readonly IContentTypeMappingService contentTypeMappingService;
 
@@ -63,15 +64,27 @@ namespace DFC.Content.Pkg.Netcore.Services.CmsApiProcessorService
             return await apiDataProcessorService.GetAsync<TModel>(httpClient, uri).ConfigureAwait(false);
         }
 
-        public async Task<TModel?> GetItemAsync<TModel>(Uri url)
+        public Task<TModel?> GetItemAsync<TModel>(Uri url)
+            where TModel : class, IBaseContentItemModel
+        {
+            return GetItemAsync<TModel>(url, false);
+        }
+
+        public async Task<TModel?> GetItemAsync<TModel>(Uri url, bool preventRecursion)
            where TModel : class, IBaseContentItemModel
         {
             var apiDataModel = await apiDataProcessorService.GetAsync<TModel>(httpClient, url)
                 .ConfigureAwait(false);
 
+            var retrievedPaths = new HashSet<string> { url.AbsolutePath, };
+
             if (apiDataModel != null)
             {
-                await GetSharedChildContentItems(apiDataModel.ContentLinks, apiDataModel.ContentItems).ConfigureAwait(false);
+                await GetSharedChildContentItems(
+                    apiDataModel.ContentLinks,
+                    apiDataModel.ContentItems,
+                    retrievedPaths,
+                    preventRecursion).ConfigureAwait(false);
             }
 
             return apiDataModel;
@@ -135,11 +148,18 @@ namespace DFC.Content.Pkg.Netcore.Services.CmsApiProcessorService
             return contentList;
         }
 
-        private async Task GetSharedChildContentItems(ContentLinksModel? model, IList<IBaseContentItemModel> contentItem)
+        private async Task GetSharedChildContentItems(
+            ContentLinksModel? model,
+            IList<IBaseContentItemModel> contentItem,
+            ICollection<string> retrievedPaths,
+            bool preventRecursion)
         {
-            var filteredLinkDetails = model?.ContentLinks?.Where(x => !contentTypeMappingService.IgnoreRelationship.Any(z => z == x.Key));
+            var filteredLinkDetails = model?.ContentLinks?
+                .Where(x => !contentTypeMappingService.IgnoreRelationship.Any(z => z == x.Key));
 
-            var linkDetails = filteredLinkDetails?.SelectMany(contentLink => contentLink.Value);
+            var linkDetails = filteredLinkDetails?
+                .SelectMany(contentLink => contentLink.Value)
+                .Where(x => !preventRecursion || !retrievedPaths.Contains(x.Uri.AbsolutePath));
 
             if (linkDetails != null && linkDetails.Any())
             {
@@ -158,18 +178,25 @@ namespace DFC.Content.Pkg.Netcore.Services.CmsApiProcessorService
 
                     if (linkDetail.Uri != null)
                     {
-                        await GetAndMapContentItem(contentItem, linkDetail).ConfigureAwait(false);
+                        await GetAndMapContentItem(contentItem, linkDetail, retrievedPaths, preventRecursion).ConfigureAwait(false);
                     }
                 }
             }
         }
 
-        private async Task GetAndMapContentItem(IList<IBaseContentItemModel> contentItem, ILinkDetails linkDetail)
+        private async Task GetAndMapContentItem(
+            IList<IBaseContentItemModel> contentItem,
+            ILinkDetails linkDetail,
+            ICollection<string> retrievedPaths,
+            bool preventRecursion)
         {
             var mappingToUse = contentTypeMappingService.GetMapping(linkDetail.ContentType!);
+            var path = linkDetail.Uri!.AbsolutePath;
+            var passedRecursionCheck = !preventRecursion || !retrievedPaths.Contains(path);
 
-            if (mappingToUse != null)
+            if (mappingToUse != null && passedRecursionCheck)
             {
+                retrievedPaths.Add(path);
                 var pagesApiContentItemModel = GetFromApiCache<IBaseContentItemModel>(mappingToUse, linkDetail.Uri!) ?? AddToApiCache(await GetContentItemAsync<IBaseContentItemModel>(mappingToUse!, linkDetail!.Uri!).ConfigureAwait(false));
 
                 if (pagesApiContentItemModel != null)
@@ -179,7 +206,12 @@ namespace DFC.Content.Pkg.Netcore.Services.CmsApiProcessorService
                     if (pagesApiContentItemModel.ContentLinks != null)
                     {
                         pagesApiContentItemModel.ContentLinks.ExcludePageLocation = true;
-                        await GetSharedChildContentItems(pagesApiContentItemModel.ContentLinks, pagesApiContentItemModel.ContentItems).ConfigureAwait(false);
+
+                        await GetSharedChildContentItems(
+                            pagesApiContentItemModel.ContentLinks,
+                            pagesApiContentItemModel.ContentItems,
+                            retrievedPaths,
+                            preventRecursion).ConfigureAwait(false);
                     }
 
                     contentItem.Add(pagesApiContentItemModel!);

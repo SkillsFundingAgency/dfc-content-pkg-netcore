@@ -18,6 +18,9 @@ namespace DFC.Content.Pkg.Netcore.Data.Contracts
         Task<TModel?> GetItemAsync<TModel>(Uri url)
            where TModel : class, IBaseContentItemModel;
 
+        Task<TModel?> GetItemAsync<TModel>(Uri url, bool preventRecursion)
+            where TModel : class, IBaseContentItemModel;
+
         Task<TChild?> GetContentItemAsync<TChild>(Type type, Uri? uri)
              where TChild : class, IBaseContentItemModel;
 
