@@ -105,7 +105,7 @@ namespace DFC.Content.Pkg.Netcore.CmsApiProcessorService.UnitTests
             A.CallTo(() => fakeApiDataProcessorService.GetAsync<ApiItemNoChildrenModel>(A<HttpClient>.Ignored, A<Uri>.Ignored)).MustHaveHappenedOnceExactly();
             A.Equals(result, expectedResult);
         }
-        
+
         [Fact]
         public async Task CmsApiServiceGetItemReturnsSuccess()
         {
