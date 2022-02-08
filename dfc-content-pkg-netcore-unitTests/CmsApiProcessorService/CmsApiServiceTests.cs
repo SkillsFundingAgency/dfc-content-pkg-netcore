@@ -107,7 +107,7 @@ namespace DFC.Content.Pkg.Netcore.CmsApiProcessorService.UnitTests
         }
 
         [Fact]
-        public async Task CmsApiServiceGetItemReturnsSuccess()
+        public async Task CmsApiServiceGetItemPreventingRecursionReturnsSuccess()
         {
             // arrange
             var expectedResult = A.Fake<ApiItemModel>();
@@ -164,7 +164,7 @@ namespace DFC.Content.Pkg.Netcore.CmsApiProcessorService.UnitTests
             var cmsApiService = new CmsApiService(CmsApiClientOptions, fakeApiDataProcessorService, fakeHttpClient, mapper, new ApiCacheService(), fakeMappingService);
 
             // act
-            var result = await cmsApiService.GetItemAsync<ApiItemModel>(url).ConfigureAwait(false);
+            var result = await cmsApiService.GetItemAsync<ApiItemModel>(url, true).ConfigureAwait(false);
 
             // assert
             var expectedCount =
