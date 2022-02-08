@@ -179,6 +179,78 @@ namespace DFC.Content.Pkg.Netcore.CmsApiProcessorService.UnitTests
         }
 
         [Fact]
+        public async Task CmsApiServiceGetItemPreventingRecursionReturnsSuccess()
+        {
+            // arrange
+            var expectedResult = A.Fake<ApiItemModel>();
+            var expectedItemResult = A.Fake<ApiContentItemModel>();
+            expectedItemResult.Url = new Uri("http://www.testChild.com");
+
+            var url = new Uri($"{CmsApiClientOptions.BaseAddress}api/someitem/", UriKind.Absolute);
+            expectedResult.Url = url;
+            var contentUrl = new Uri("http://www.test.com");
+
+            var childContentUrl = new Uri("http://www.testChild.com");
+            var fakeDictionary = new Dictionary<string, Type>
+            {
+                { "test", typeof(ApiContentItemModel) },
+            };
+
+            A.CallTo(() => fakeMappingService.Mappings).Returns(fakeDictionary);
+            A.CallTo(() => fakeApiDataProcessorService.GetAsync<ApiItemModel>(A<HttpClient>.Ignored, A<Uri>.Ignored)).Returns(expectedResult);
+            A.CallTo(() => fakeApiDataProcessorService.GetAsync<ApiContentItemModel>(A<HttpClient>.Ignored, contentUrl)).Returns(expectedItemResult);
+            A.CallTo(() => fakeApiDataProcessorService.GetAsync<ApiContentItemModel>(A<HttpClient>.Ignored, childContentUrl)).Returns(new ApiContentItemModel());
+            expectedResult.ContentLinks = new ContentLinksModel(new JObject())
+            {
+                ContentLinks = new List<KeyValuePair<string, List<ILinkDetails>>>()
+                {
+                    new KeyValuePair<string, List<ILinkDetails>>(
+                        "test",
+                        new List<ILinkDetails>
+                        {
+                            new LinkDetails
+                            {
+                                Uri = contentUrl,
+                                ContentType = "test",
+                            },
+                        }),
+                },
+            };
+            expectedItemResult.ContentLinks = new ContentLinksModel(new JObject())
+            {
+                ContentLinks = new List<KeyValuePair<string, List<ILinkDetails>>>()
+                {
+                    new KeyValuePair<string, List<ILinkDetails>>(
+                        "Child",
+                        new List<ILinkDetails>
+                        {
+                            new LinkDetails
+                            {
+                                Uri = new Uri("http://www.testChild.com"),
+                                ContentType = "test",
+                            },
+                        }),
+                },
+            };
+
+            var cmsApiService = new CmsApiService(CmsApiClientOptions, fakeApiDataProcessorService, fakeHttpClient, mapper, new ApiCacheService(), fakeMappingService);
+
+            // act
+            var result = await cmsApiService.GetItemAsync<ApiItemModel>(url, true).ConfigureAwait(false);
+
+            // assert
+            var expectedCount =
+                expectedResult.ContentLinks.ContentLinks.SelectMany(contentLink => contentLink.Value).Count() +
+                expectedItemResult.ContentLinks.ContentLinks.SelectMany(contentLink => contentLink.Value).Count();
+
+            A.CallTo(() => fakeApiDataProcessorService.GetAsync<ApiItemModel>(A<HttpClient>.Ignored, A<Uri>.Ignored)).MustHaveHappenedOnceExactly();
+
+            // Account for cache hit on child item
+            A.CallTo(() => fakeApiDataProcessorService.GetAsync<ApiItemModel>(A<HttpClient>.Ignored, A<Uri>.Ignored)).MustHaveHappened(expectedCount - 1, Times.Exactly);
+            A.Equals(result, expectedResult);
+        }
+
+        [Fact]
         public async Task CmsApiServiceGetContentItemReturnsSuccess()
         {
             // arrange
