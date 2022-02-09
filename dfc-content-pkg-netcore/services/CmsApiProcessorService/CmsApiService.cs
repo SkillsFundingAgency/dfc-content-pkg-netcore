@@ -95,7 +95,7 @@ namespace DFC.Content.Pkg.Netcore.Services.CmsApiProcessorService
         private static string GetContentType(string path)
         {
             var pathParts = path.Split('/');
-            return pathParts[3];
+            return pathParts.Length > 3 ? pathParts[3] : null;
         }
 
         public async Task<TChild?> GetContentItemAsync<TChild>(Uri? uri)
