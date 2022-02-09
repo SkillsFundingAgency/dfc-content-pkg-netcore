@@ -150,7 +150,7 @@ namespace DFC.Content.Pkg.Netcore.Services.CmsApiProcessorService
             return contentList;
         }
 
-        private bool IsAncestor(string absolutePath, Dictionary<int, List<string>> retrievedPaths, int level)
+        private static bool IsOwnAncestor(string absolutePath, Dictionary<int, List<string>> retrievedPaths, int level)
         {
             for (var currentLevel = level - 1; currentLevel >= 0; currentLevel--)
             {
@@ -182,7 +182,7 @@ namespace DFC.Content.Pkg.Netcore.Services.CmsApiProcessorService
 
             var linkDetails = filteredLinkDetails?
                 .SelectMany(contentLink => contentLink.Value)
-                .Where(x => !preventRecursion || !IsAncestor(x.Uri.AbsolutePath, retrievedPaths, level));
+                .Where(x => !preventRecursion || !IsOwnAncestor(x.Uri.AbsolutePath, retrievedPaths, level));
 
             if (linkDetails != null && linkDetails.Any())
             {
@@ -216,7 +216,8 @@ namespace DFC.Content.Pkg.Netcore.Services.CmsApiProcessorService
         {
             var mappingToUse = contentTypeMappingService.GetMapping(linkDetail.ContentType!);
             var path = linkDetail.Uri!.AbsolutePath;
-            var passedRecursionCheck = !preventRecursion || !IsAncestor(path, retrievedPaths, level);
+            var isOwnAncestor = IsOwnAncestor(path, retrievedPaths, level);
+            var passedRecursionCheck = !preventRecursion || !isOwnAncestor;
 
             if (mappingToUse != null && passedRecursionCheck)
             {
@@ -226,11 +227,24 @@ namespace DFC.Content.Pkg.Netcore.Services.CmsApiProcessorService
                 }
 
                 retrievedPaths[level].Add(path);
-                var pagesApiContentItemModel = GetFromApiCache<IBaseContentItemModel>(mappingToUse, linkDetail.Uri!) ?? AddToApiCache(await GetContentItemAsync<IBaseContentItemModel>(mappingToUse!, linkDetail!.Uri!).ConfigureAwait(false));
+
+                #pragma warning disable CA1307
+                var uriWithoutMultiDirection = new Uri(linkDetail.Uri!.ToString()
+                    .Replace("/false", string.Empty)
+                    .Replace("/true", string.Empty));
+                #pragma warning restore CA1307
+
+                var uriWithLoggingDetail = new Uri(linkDetail.Uri! + "?level=" + level + "&isOwnAncestor=" + isOwnAncestor);
+
+                var pagesApiContentItemModel = GetFromApiCache<IBaseContentItemModel>(mappingToUse, uriWithoutMultiDirection)
+                                               ?? AddToApiCache(
+                                                   uriWithoutMultiDirection,
+                                                   await GetContentItemAsync<IBaseContentItemModel>(mappingToUse!, uriWithLoggingDetail).ConfigureAwait(false));
 
                 if (pagesApiContentItemModel != null)
                 {
                     mapper.Map(linkDetail, pagesApiContentItemModel);
+                    pagesApiContentItemModel.Url = uriWithoutMultiDirection;
 
                     if (pagesApiContentItemModel.ContentLinks != null)
                     {
@@ -260,7 +274,7 @@ namespace DFC.Content.Pkg.Netcore.Services.CmsApiProcessorService
             return result;
         }
 
-        private TModel? AddToApiCache<TModel>(TModel? model)
+        private TModel? AddToApiCache<TModel>(Uri url, TModel? model)
             where TModel : class, IBaseContentItemModel
         {
             if (model == null)
@@ -268,7 +282,7 @@ namespace DFC.Content.Pkg.Netcore.Services.CmsApiProcessorService
                 return null;
             }
 
-            apiCacheService.AddOrUpdate(model!.Url!, model);
+            apiCacheService.AddOrUpdate(url, model);
             return model;
         }
 
