@@ -43,7 +43,17 @@ namespace DFC.Content.Pkg.Netcore.Services.CmsApiProcessorService
                      $"{cmsApiClientOptions.BaseAddress}{cmsApiClientOptions.SummaryEndpoint}{contentType}",
                      UriKind.Absolute);
 
-            return await GetSummaryAsync<TApiModel>(url).ConfigureAwait(false);
+            return await GetSummaryAsync<TApiModel>(url, true).ConfigureAwait(false);
+        }
+
+        public async Task<IList<TApiModel>?> GetSummaryAsync<TApiModel>(string contentType, bool clearCache)
+            where TApiModel : class, IApiDataModel
+        {
+            var url = new Uri(
+                $"{cmsApiClientOptions.BaseAddress}{cmsApiClientOptions.SummaryEndpoint}{contentType}",
+                UriKind.Absolute);
+
+            return await GetSummaryAsync<TApiModel>(url, clearCache).ConfigureAwait(false);
         }
 
         public async Task<IList<TApiModel>?> GetSummaryAsync<TApiModel>()
@@ -53,7 +63,7 @@ namespace DFC.Content.Pkg.Netcore.Services.CmsApiProcessorService
                   $"{cmsApiClientOptions.BaseAddress}{cmsApiClientOptions.SummaryEndpoint}",
                   UriKind.Absolute);
 
-            return await GetSummaryAsync<TApiModel>(url).ConfigureAwait(false);
+            return await GetSummaryAsync<TApiModel>(url, true).ConfigureAwait(false);
         }
 
         public async Task<TModel?> GetItemAsync<TModel>(string contentType, Guid id)
@@ -67,10 +77,10 @@ namespace DFC.Content.Pkg.Netcore.Services.CmsApiProcessorService
         public Task<TModel?> GetItemAsync<TModel>(Uri url)
             where TModel : class, IBaseContentItemModel
         {
-            return GetItemAsync<TModel>(url, false);
+            return GetItemAsync<TModel>(url, new CmsApiOptions { PreventRecursion = false });
         }
 
-        public async Task<TModel?> GetItemAsync<TModel>(Uri url, bool preventRecursion)
+        public async Task<TModel?> GetItemAsync<TModel>(Uri url, CmsApiOptions options)
            where TModel : class, IBaseContentItemModel
         {
             var apiDataModel = await apiDataProcessorService.GetAsync<TModel>(httpClient, url)
@@ -85,7 +95,7 @@ namespace DFC.Content.Pkg.Netcore.Services.CmsApiProcessorService
                     apiDataModel.ContentLinks,
                     apiDataModel.ContentItems,
                     retrievedContentTypes,
-                    preventRecursion,
+                    options,
                     level).ConfigureAwait(false);
             }
 
@@ -101,35 +111,26 @@ namespace DFC.Content.Pkg.Netcore.Services.CmsApiProcessorService
         public async Task<TChild?> GetContentItemAsync<TChild>(Uri? uri)
              where TChild : class, IBaseContentItemModel
         {
-            if (uri != null)
+            if (uri == null)
             {
-                if (uri.ToString().Contains(@"//skill", StringComparison.CurrentCultureIgnoreCase) || uri.ToString().Contains(@"//knowledge", StringComparison.CurrentCultureIgnoreCase))
-                {
-                    return null;
-                }
-
-                return await apiDataProcessorService.GetAsync<TChild>(httpClient, uri)
-                    .ConfigureAwait(false);
+                return null;
             }
 
-            return null;
+            return await apiDataProcessorService.GetAsync<TChild>(httpClient, uri)
+                .ConfigureAwait(false);
+
         }
 
         public async Task<TChild?> GetContentItemAsync<TChild>(Type type, Uri? uri)
              where TChild : class, IBaseContentItemModel
         {
-            if (uri != null)
+            if (uri == null)
             {
-                if (uri.ToString().Contains(@"//skill", StringComparison.OrdinalIgnoreCase) || uri.ToString().Contains(@"//knowledge", StringComparison.OrdinalIgnoreCase))
-                {
-                    return null;
-                }
-
-                return await apiDataProcessorService.GetAsync<TChild>(type, httpClient, uri)
-                    .ConfigureAwait(false);
+                return null;
             }
 
-            return null;
+            return await apiDataProcessorService.GetAsync<TChild>(type, httpClient, uri)
+                .ConfigureAwait(false);
         }
 
         public async Task<List<TApiModel>?> GetContentAsync<TApiModel>()
@@ -182,7 +183,7 @@ namespace DFC.Content.Pkg.Netcore.Services.CmsApiProcessorService
             ContentLinksModel? model,
             IList<IBaseContentItemModel> contentItem,
             Dictionary<int, List<string>> retrievedPaths,
-            bool preventRecursion,
+            CmsApiOptions options,
             int level)
         {
             var filteredLinkDetails = model?.ContentLinks?
@@ -190,7 +191,7 @@ namespace DFC.Content.Pkg.Netcore.Services.CmsApiProcessorService
 
             var linkDetails = filteredLinkDetails?
                 .SelectMany(contentLink => contentLink.Value)
-                .Where(x => !preventRecursion || !AncestorsContainsType(x.Uri.AbsolutePath, retrievedPaths, level));
+                .Where(x => !options.PreventRecursion || !AncestorsContainsType(x.Uri.AbsolutePath, retrievedPaths, level));
 
             if (linkDetails != null && linkDetails.Any())
             {
@@ -209,7 +210,7 @@ namespace DFC.Content.Pkg.Netcore.Services.CmsApiProcessorService
 
                     if (linkDetail.Uri != null)
                     {
-                        await GetAndMapContentItem(contentItem, linkDetail, retrievedPaths, preventRecursion, level + 1).ConfigureAwait(false);
+                        await GetAndMapContentItem(contentItem, linkDetail, retrievedPaths, options, level + 1).ConfigureAwait(false);
                     }
                 }
             }
@@ -219,62 +220,82 @@ namespace DFC.Content.Pkg.Netcore.Services.CmsApiProcessorService
             IList<IBaseContentItemModel> contentItem,
             ILinkDetails linkDetail,
             Dictionary<int, List<string>> retrievedPaths,
-            bool preventRecursion,
+            CmsApiOptions options,
             int level)
         {
             var mappingToUse = contentTypeMappingService.GetMapping(linkDetail.ContentType!);
 
             var isOwnAncestor = AncestorsContainsType(linkDetail.Uri!.AbsolutePath, retrievedPaths, level);
-            var passedRecursionCheck = !preventRecursion || !isOwnAncestor;
+            var passedRecursionCheck = !options.PreventRecursion || !isOwnAncestor;
 
-            if (mappingToUse != null && passedRecursionCheck)
+            if (mappingToUse == null || !passedRecursionCheck)
             {
-                if (!retrievedPaths.ContainsKey(level))
-                {
-                    retrievedPaths.Add(level, new List<string>());
-                }
-
-                var contentType = GetContentType(linkDetail.Uri!.AbsolutePath);
-                retrievedPaths[level].Add(contentType);
-
-                var pagesApiContentItemModel = GetFromApiCache<IBaseContentItemModel>(mappingToUse, linkDetail.Uri)
-                                               ?? AddToApiCache(
-                                                   linkDetail.Uri,
-                                                   await GetContentItemAsync<IBaseContentItemModel>(mappingToUse!, linkDetail.Uri!).ConfigureAwait(false));
-
-                if (pagesApiContentItemModel != null)
-                {
-                    mapper.Map(linkDetail, pagesApiContentItemModel);
-
-                    if (pagesApiContentItemModel.ContentLinks != null)
-                    {
-                        pagesApiContentItemModel.ContentLinks.ExcludePageLocation = true;
-
-                        await GetSharedChildContentItems(
-                            pagesApiContentItemModel.ContentLinks,
-                            pagesApiContentItemModel.ContentItems,
-                            retrievedPaths,
-                            preventRecursion,
-                            level).ConfigureAwait(false);
-                    }
-
-                    contentItem.Add(pagesApiContentItemModel!);
-                }
+                return;
             }
+
+            if (!retrievedPaths.ContainsKey(level))
+            {
+                retrievedPaths.Add(level, new List<string>());
+            }
+
+            var contentType = GetContentType(linkDetail.Uri!.AbsolutePath) ?? "Unknown";
+            retrievedPaths[level].Add(contentType);
+
+            var keyName = (options.ContentTypeOptions?.ContainsKey(contentType) == true ?
+                options.ContentTypeOptions[contentType].KeyName : null) ?? "Uri";
+
+            var key = keyName.ToUpperInvariant() switch
+            {
+                "TITLE" => linkDetail.Title!,
+                _ => linkDetail.Uri.ToString()
+            };
+
+            if (options.ContentTypeOptions?.ContainsKey(contentType) == true &&
+                options.ContentTypeOptions[contentType].Transform != null)
+            {
+                key = options.ContentTypeOptions[contentType].Transform!(key);
+            }
+
+            var pagesApiContentItemModel = GetFromApiCache<IBaseContentItemModel>(mappingToUse, key)
+                ?? AddToApiCache(key, await GetContentItemAsync<IBaseContentItemModel>(mappingToUse!, linkDetail.Uri!).ConfigureAwait(false));
+
+            if (pagesApiContentItemModel == null)
+            {
+                return;
+            }
+
+            mapper.Map(linkDetail, pagesApiContentItemModel);
+
+            if (pagesApiContentItemModel.ContentLinks != null)
+            {
+                pagesApiContentItemModel.ContentLinks.ExcludePageLocation = true;
+
+                await GetSharedChildContentItems(
+                    pagesApiContentItemModel.ContentLinks,
+                    pagesApiContentItemModel.ContentItems,
+                    retrievedPaths,
+                    options,
+                    level).ConfigureAwait(false);
+            }
+
+            contentItem.Add(pagesApiContentItemModel!);
         }
 
-        private async Task<IList<TApiModel>?> GetSummaryAsync<TApiModel>(Uri url)
+        private async Task<IList<TApiModel>?> GetSummaryAsync<TApiModel>(Uri url, bool clearCache)
           where TApiModel : class, IApiDataModel
         {
             var result = await apiDataProcessorService.GetAsync<IList<TApiModel>>(httpClient, url)
               .ConfigureAwait(false);
 
-            apiCacheService.Clear();
+            if (clearCache)
+            {
+                apiCacheService.Clear();
+            }
 
             return result;
         }
 
-        private TModel? AddToApiCache<TModel>(Uri url, TModel? model)
+        private TModel? AddToApiCache<TModel>(string key, TModel? model)
             where TModel : class, IBaseContentItemModel
         {
             if (model == null)
@@ -282,14 +303,14 @@ namespace DFC.Content.Pkg.Netcore.Services.CmsApiProcessorService
                 return null;
             }
 
-            apiCacheService.AddOrUpdate(url, model);
+            apiCacheService.AddOrUpdate(key, model);
             return model;
         }
 
-        private TModel? GetFromApiCache<TModel>(Type type, Uri uri)
+        private TModel? GetFromApiCache<TModel>(Type type, string key)
            where TModel : class, IBaseContentItemModel
         {
-            return apiCacheService.Retrieve<TModel>(type, uri);
+            return apiCacheService.Retrieve<TModel>(type, key);
         }
     }
 }

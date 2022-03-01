@@ -9,17 +9,17 @@ namespace DFC.Content.Pkg.Netcore.Services
     {
         public int Count => CachedItems != null ? CachedItems.Count : 0;
 
-        private Dictionary<Uri, string>? CachedItems { get; set; }
+        private Dictionary<string, string>? CachedItems { get; set; }
 
-        public void AddOrUpdate(Uri id, object obj)
+        public void AddOrUpdate(string key, object obj)
         {
-            if (CachedItems != null && CachedItems.ContainsKey(id))
+            if (CachedItems != null && CachedItems.ContainsKey(key))
             {
-                CachedItems[id] = JsonConvert.SerializeObject(obj);
+                CachedItems[key] = JsonConvert.SerializeObject(obj);
                 return;
             }
 
-            CachedItems?.Add(id, JsonConvert.SerializeObject(obj));
+            CachedItems?.Add(key, JsonConvert.SerializeObject(obj));
         }
 
         public void Clear()
@@ -29,7 +29,7 @@ namespace DFC.Content.Pkg.Netcore.Services
 
         public void StartCache()
         {
-            CachedItems = new Dictionary<Uri, string>();
+            CachedItems = new Dictionary<string, string>();
         }
 
         public void StopCache()
@@ -37,28 +37,28 @@ namespace DFC.Content.Pkg.Netcore.Services
             CachedItems = null;
         }
 
-        public void Remove(Uri id)
+        public void Remove(string key)
         {
-            CachedItems?.Remove(id);
+            CachedItems?.Remove(key);
         }
 
-        public TModel? Retrieve<TModel>(Uri id)
+        public TModel? Retrieve<TModel>(string key)
             where TModel : class
         {
-            if (CachedItems != null && CachedItems.ContainsKey(id))
+            if (CachedItems != null && CachedItems.ContainsKey(key))
             {
-                return JsonConvert.DeserializeObject<TModel>(CachedItems[id]);
+                return JsonConvert.DeserializeObject<TModel>(CachedItems[key]);
             }
 
             return null;
         }
 
-        public TModel? Retrieve<TModel>(Type type, Uri id)
+        public TModel? Retrieve<TModel>(Type type, string key)
             where TModel : class
         {
-            if (CachedItems != null && CachedItems.ContainsKey(id))
+            if (CachedItems != null && CachedItems.ContainsKey(key))
             {
-                return (TModel?)JsonConvert.DeserializeObject(CachedItems[id], type);
+                return (TModel?)JsonConvert.DeserializeObject(CachedItems[key], type);
             }
 
             return null;

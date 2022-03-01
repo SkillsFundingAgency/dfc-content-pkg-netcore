@@ -16,7 +16,7 @@ namespace DFC.Content.Pkg.Netcore.UnitTests
             var serviceToTest = BuildApiCacheService();
 
             //Act
-            serviceToTest.AddOrUpdate(new Uri("http://somewhere.com/aresource"), new ApiItemModel());
+            serviceToTest.AddOrUpdate(new Uri("http://somewhere.com/aresource").ToString(), new ApiItemModel());
 
             //Assert
             Assert.Equal(0, serviceToTest.Count);
@@ -30,9 +30,9 @@ namespace DFC.Content.Pkg.Netcore.UnitTests
             var itemToCache = new ApiItemModel() { Description = "a test item" };
 
             //Act
-            serviceToTest.AddOrUpdate(new Uri("http://somewhere.com/aresource"), new ApiItemModel());
-            serviceToTest.AddOrUpdate(new Uri("http://somewhere.com/aresource"), itemToCache);
-            var result = serviceToTest.Retrieve<ApiItemModel>(new Uri("http://somewhere.com/aresource"));
+            serviceToTest.AddOrUpdate(new Uri("http://somewhere.com/aresource").ToString(), new ApiItemModel());
+            serviceToTest.AddOrUpdate(new Uri("http://somewhere.com/aresource").ToString(), itemToCache);
+            var result = serviceToTest.Retrieve<ApiItemModel>(new Uri("http://somewhere.com/aresource").ToString());
 
             //Assert
             Assert.Equal(0, serviceToTest.Count);
@@ -46,7 +46,7 @@ namespace DFC.Content.Pkg.Netcore.UnitTests
             var serviceToTest = BuildApiCacheService();
 
             //Act
-            serviceToTest.AddOrUpdate(new Uri("http://somewhere.com/aresource"), new ApiItemModel());
+            serviceToTest.AddOrUpdate(new Uri("http://somewhere.com/aresource").ToString(), new ApiItemModel());
             serviceToTest.Clear();
 
             //Assert
@@ -60,8 +60,8 @@ namespace DFC.Content.Pkg.Netcore.UnitTests
             var serviceToTest = BuildApiCacheService();
 
             //Act
-            serviceToTest.AddOrUpdate(new Uri("http://somewhere.com/aresource"), new ApiItemModel());
-            serviceToTest.Remove(new Uri("http://somewhere.com/aresource"));
+            serviceToTest.AddOrUpdate(new Uri("http://somewhere.com/aresource").ToString(), new ApiItemModel());
+            serviceToTest.Remove(new Uri("http://somewhere.com/aresource").ToString());
 
             //Assert
             Assert.Equal(0, serviceToTest.Count);
@@ -75,8 +75,8 @@ namespace DFC.Content.Pkg.Netcore.UnitTests
             var itemToCache = new ApiItemModel() { Description = "a test item" };
 
             //Act
-            serviceToTest.AddOrUpdate(new Uri("http://somewhere.com/aresource"), itemToCache);
-            var result = serviceToTest.Retrieve<ApiItemModel>(new Uri("http://somewhere.com/aresource"));
+            serviceToTest.AddOrUpdate(new Uri("http://somewhere.com/aresource").ToString(), itemToCache);
+            var result = serviceToTest.Retrieve<ApiItemModel>(new Uri("http://somewhere.com/aresource").ToString());
 
             //Assert
             Assert.Equal(0, serviceToTest.Count);
@@ -91,8 +91,8 @@ namespace DFC.Content.Pkg.Netcore.UnitTests
             var itemToCache = new ApiItemModel() { Description = "a test item" };
 
             //Act
-            serviceToTest.AddOrUpdate(new Uri("http://somewhere.com/aresource"), itemToCache);
-            var result = serviceToTest.Retrieve<ApiItemModel>(itemToCache.GetType(), new Uri("http://somewhere.com/aresource"));
+            serviceToTest.AddOrUpdate(new Uri("http://somewhere.com/aresource").ToString(), itemToCache);
+            var result = serviceToTest.Retrieve<ApiItemModel>(itemToCache.GetType(), new Uri("http://somewhere.com/aresource").ToString());
 
             //Assert
             Assert.Equal(0, serviceToTest.Count);
@@ -107,8 +107,8 @@ namespace DFC.Content.Pkg.Netcore.UnitTests
             var itemToCache = new ApiItemModel() { Description = "a test item" };
 
             //Act
-            serviceToTest.AddOrUpdate(new Uri("http://somewhere.com/aresource"), itemToCache);
-            var result = serviceToTest.Retrieve<IBaseContentItemModel>(itemToCache.GetType(), new Uri("http://somewhere.com/aresource1"));
+            serviceToTest.AddOrUpdate(new Uri("http://somewhere.com/aresource").ToString(), itemToCache);
+            var result = serviceToTest.Retrieve<IBaseContentItemModel>(itemToCache.GetType(), new Uri("http://somewhere.com/aresource1").ToString());
 
             //Assert
             Assert.Equal(0, serviceToTest.Count);

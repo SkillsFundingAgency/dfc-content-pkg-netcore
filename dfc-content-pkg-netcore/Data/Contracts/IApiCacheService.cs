@@ -6,7 +6,7 @@ namespace DFC.Content.Pkg.Netcore.Data.Contracts
     {
         int Count { get; }
 
-        void AddOrUpdate(Uri id, object obj);
+        void AddOrUpdate(string key, object obj);
 
         void Clear();
 
@@ -14,12 +14,12 @@ namespace DFC.Content.Pkg.Netcore.Data.Contracts
 
         void StopCache();
 
-        void Remove(Uri id);
+        void Remove(string key);
 
-        TModel? Retrieve<TModel>(Uri id)
+        TModel? Retrieve<TModel>(string key)
             where TModel : class;
 
-        TModel? Retrieve<TModel>(Type type, Uri id)
+        TModel? Retrieve<TModel>(Type type, string key)
             where TModel : class;
     }
 }
