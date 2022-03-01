@@ -23,7 +23,7 @@ namespace DFC.Content.Pkg.Netcore.Services.ApiProcessorService
         {
             _ = httpClient ?? throw new ArgumentNullException(nameof(httpClient));
 
-            logger.LogInformation($"Loading data from {url}");
+            logger.LogInformation("Loading data from {Url}", url);
 
             using var request = new HttpRequestMessage(HttpMethod.Get, url);
 
