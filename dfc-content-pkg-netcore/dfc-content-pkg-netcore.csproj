@@ -36,7 +36,15 @@
   </ItemGroup>
 	
 	<ItemGroup>
-	  <Folder Include="Helpers\" />
+	  <Compile Remove="Helpers\**" />
+	</ItemGroup>
+	
+	<ItemGroup>
+	  <EmbeddedResource Remove="Helpers\**" />
+	</ItemGroup>
+	
+	<ItemGroup>
+	  <None Remove="Helpers\**" />
 	</ItemGroup>
 
 </Project>

@@ -1,6 +1,7 @@
 ﻿using DFC.Content.Pkg.Netcore.Data.Contracts;
 using Newtonsoft.Json;
 using System;
+using System.Collections.Generic;
 using System.Net;
 using System.Net.Http;
 using System.Net.Mime;
@@ -43,6 +44,23 @@ namespace DFC.Content.Pkg.Netcore.Services.ApiProcessorService
             if (!string.IsNullOrWhiteSpace(response))
             {
                 return (TApiModel?)JsonConvert.DeserializeObject(response, type);
+            }
+
+            return default;
+        }
+
+        public async Task<TApiModel?> PostAsync<TApiModel>(
+            HttpClient? httpClient,
+            Uri url,
+            Dictionary<string, object> parameters) where TApiModel : class
+        {
+            _ = httpClient ?? throw new ArgumentNullException(nameof(httpClient));
+
+            var response = await apiService.PostAsync(httpClient, url, MediaTypeNames.Application.Json, parameters).ConfigureAwait(false);
+
+            if (!string.IsNullOrWhiteSpace(response))
+            {
+                return JsonConvert.DeserializeObject<TApiModel>(response);
             }
 
             return default;

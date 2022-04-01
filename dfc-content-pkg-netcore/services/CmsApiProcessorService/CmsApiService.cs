@@ -83,6 +83,33 @@ namespace DFC.Content.Pkg.Netcore.Services.CmsApiProcessorService
         public async Task<TModel?> GetItemAsync<TModel>(Uri url, CmsApiOptions options)
            where TModel : class, IBaseContentItemModel
         {
+            url = new Uri(url.ToString().Replace("https://dfc-dev-api-cont-fa.azurewebsites.net", "http://localhost:7071"));
+            var useExpandFunction = !IsSummaryRequest(url?.ToString());
+
+            if (useExpandFunction)
+            {
+                var (contentType, id) = GetContentTypeAndId(url!.ToString());
+                var multiDirectional = url.ToString().EndsWith("/true", StringComparison.InvariantCultureIgnoreCase);
+
+                var hostWithPort = url.IsDefaultPort ? url.Host : $"{url.Host}:{url.Port}";
+                var uri = new Uri($"{url.Scheme}://{hostWithPort}/api/expand/{contentType}/{id}");
+                const int maxDepth = 5;
+
+                var typesToInclude = contentTypeMappingService.Mappings
+                    .Select(mapping => mapping.Key.ToLowerInvariant())
+                    .ToArray();
+
+                var bodyParameters = new Dictionary<string, object>
+                {
+                    { "MaxDepth", maxDepth },
+                    { "MultiDirectional", multiDirectional },
+                    { "TypesToInclude", typesToInclude },
+                };
+
+                return await apiDataProcessorService.PostAsync<TModel>(httpClient, uri, bodyParameters)
+                    .ConfigureAwait(false);
+            }
+
             var apiDataModel = await apiDataProcessorService.GetAsync<TModel>(httpClient, url)
                 .ConfigureAwait(false);
 
@@ -118,7 +145,6 @@ namespace DFC.Content.Pkg.Netcore.Services.CmsApiProcessorService
 
             return await apiDataProcessorService.GetAsync<TChild>(httpClient, uri)
                 .ConfigureAwait(false);
-
         }
 
         public async Task<TChild?> GetContentItemAsync<TChild>(Type type, Uri? uri)
@@ -177,6 +203,37 @@ namespace DFC.Content.Pkg.Netcore.Services.CmsApiProcessorService
             }
 
             return false;
+        }
+
+        private static bool IsSummaryRequest(string? uri)
+        {
+            var (_, id) = GetContentTypeAndId(uri);
+            return id == Guid.Empty;
+        }
+
+        private static (string ContentType, Guid Id) GetContentTypeAndId(string? uri)
+        {
+            if (string.IsNullOrEmpty(uri))
+            {
+                return (string.Empty, Guid.Empty);
+            }
+
+            var pathOnly = uri.StartsWith("http", StringComparison.InvariantCultureIgnoreCase) ?
+                new Uri(uri, UriKind.Absolute).AbsolutePath
+                : uri;
+
+            pathOnly = pathOnly
+                .ToLowerInvariant()
+                .Replace("/api/execute", string.Empty, StringComparison.InvariantCultureIgnoreCase);
+
+            var uriParts = pathOnly.Trim('/').Split('/');
+            var contentType = uriParts[0];
+
+            var id = uriParts.Length >= 2 && Guid.TryParse(uriParts[1], out var guidId) ?
+                guidId
+                : Guid.Empty;
+
+            return (contentType, id);
         }
 
         private async Task GetSharedChildContentItems(
