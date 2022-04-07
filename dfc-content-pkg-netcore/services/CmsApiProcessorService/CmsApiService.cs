@@ -83,7 +83,6 @@ namespace DFC.Content.Pkg.Netcore.Services.CmsApiProcessorService
         public async Task<TModel?> GetItemAsync<TModel>(Uri url, CmsApiOptions options)
            where TModel : class, IBaseContentItemModel
         {
-            url = new Uri(url.ToString().Replace("https://dfc-dev-api-cont-fa.azurewebsites.net", "http://localhost:7071"));
             var useExpandFunction = !IsSummaryRequest(url?.ToString());
 
             if (useExpandFunction)
