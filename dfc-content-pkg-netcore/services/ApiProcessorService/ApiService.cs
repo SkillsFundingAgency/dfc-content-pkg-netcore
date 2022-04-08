@@ -2,6 +2,7 @@
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using System;
+using System.Collections.Generic;
 using System.Net;
 using System.Net.Http;
 using System.Net.Mime;
@@ -29,6 +30,45 @@ namespace DFC.Content.Pkg.Netcore.Services.ApiProcessorService
 
             request.Headers.Accept.Clear();
             request.Headers.Accept.Add(new System.Net.Http.Headers.MediaTypeWithQualityHeaderValue(acceptHeader));
+
+            try
+            {
+                var response = await httpClient.SendAsync(request).ConfigureAwait(false);
+                string? responseString = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
+
+                if (!response.IsSuccessStatusCode)
+                {
+                    logger.LogError($"Failed to get {acceptHeader} data from {url}, received error : '{responseString}', returning empty content.");
+                    responseString = null;
+                }
+                else if (response.StatusCode != System.Net.HttpStatusCode.OK)
+                {
+                    logger.LogInformation($"Status - {response.StatusCode} with response '{responseString}' received from {url}, returning empty content.");
+                    responseString = null;
+                }
+
+                return responseString;
+            }
+            catch (Exception ex)
+            {
+                logger.LogError(ex, $"Error received getting {acceptHeader} data '{ex.InnerException?.Message}'. Received from {url}, returning empty content");
+            }
+
+            return default;
+        }
+
+        public async Task<string?> PostAsync(HttpClient? httpClient, Uri url, string acceptHeader, Dictionary<string, object> parameters)
+        {
+            _ = httpClient ?? throw new ArgumentNullException(nameof(httpClient));
+
+            logger.LogInformation("Loading data from {Url}", url);
+
+            using var request = new HttpRequestMessage(HttpMethod.Post, url);
+
+            request.Headers.Accept.Clear();
+            request.Headers.Accept.Add(new System.Net.Http.Headers.MediaTypeWithQualityHeaderValue(acceptHeader));
+
+            request.Content = new StringContent(JsonConvert.SerializeObject(parameters), Encoding.UTF8, "application/json");
 
             try
             {

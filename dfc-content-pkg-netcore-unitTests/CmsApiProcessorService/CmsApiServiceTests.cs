@@ -107,6 +107,28 @@ namespace DFC.Content.Pkg.Netcore.CmsApiProcessorService.UnitTests
         }
 
         [Fact]
+        public async Task CmsApiServiceGetItemWithExpandNoChildrenByUrlReturnsSuccess()
+        {
+            // arrange
+            var expectedResult = A.Fake<ApiItemNoChildrenModel>();
+            var url = new Uri("https://www.somewhere.com/api/execute/test/fefbfca2-6ac9-4748-963c-b5c82aa262d7", UriKind.Absolute);
+
+            A.CallTo(() => fakeApiDataProcessorService.GetAsync<ApiItemNoChildrenModel>(A<HttpClient>.Ignored, A<Uri>.Ignored)).Returns(expectedResult);
+
+            var fakeContentTypeMappingService = A.Fake<IContentTypeMappingService>();
+            A.CallTo(() => fakeContentTypeMappingService.IgnoreRelationship).Returns(new List<string>());
+
+            var cmsApiService = new CmsApiService(CmsApiClientOptions, fakeApiDataProcessorService, fakeHttpClient, mapper, new ApiCacheService(), A.Fake<IContentTypeMappingService>());
+
+            // act
+            var result = await cmsApiService.GetItemAsync<ApiItemNoChildrenModel>(url).ConfigureAwait(false);
+
+            // assert
+            A.CallTo(() => fakeApiDataProcessorService.PostAsync<ApiItemNoChildrenModel>(A<HttpClient>.Ignored, A<Uri>.Ignored, A<Dictionary<string, object>>.Ignored)).MustHaveHappenedOnceExactly();
+            A.Equals(result, expectedResult);
+        }
+
+        [Fact]
         public async Task CmsApiServiceGetItemReturnsSuccess()
         {
             // arrange
