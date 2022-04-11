@@ -7,7 +7,9 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Net.Http;
+using System.Text.Json;
 using System.Threading.Tasks;
+using Newtonsoft.Json.Linq;
 
 namespace DFC.Content.Pkg.Netcore.Services.CmsApiProcessorService
 {
@@ -105,8 +107,15 @@ namespace DFC.Content.Pkg.Netcore.Services.CmsApiProcessorService
                     { "TypesToInclude", typesToInclude },
                 };
 
-                return await apiDataProcessorService.PostAsync<TModel>(httpClient, uri, bodyParameters)
+                var responseJObject = await apiDataProcessorService.PostAsync<JObject>(httpClient, uri, bodyParameters)
                     .ConfigureAwait(false);
+
+                if (responseJObject == null)
+                {
+                    throw new NullReferenceException();
+                }
+
+                return (TModel?)ContentItemWithMappedChildren(typeof(TModel), responseJObject);
             }
 
             var apiDataModel = await apiDataProcessorService.GetAsync<TModel>(httpClient, url)
@@ -126,6 +135,29 @@ namespace DFC.Content.Pkg.Netcore.Services.CmsApiProcessorService
             }
 
             return apiDataModel;
+        }
+
+        private IBaseContentItemModel ContentItemWithMappedChildren(Type mappedType, JToken parentContentItemToken)
+        {
+            // Clear out the content items, after taking a cut of them, as we need to map them separately.
+            var contentItems = parentContentItemToken["ContentItems"];
+            parentContentItemToken["ContentItems"] = null;
+
+            var children = new List<IBaseContentItemModel>();
+
+            foreach (var contentItemToken in contentItems!)
+            {
+                var contentType = (contentItemToken["ContentType"] as JValue)!.Value as string;
+                mappedType = contentTypeMappingService.GetMapping(contentType!)!;
+
+                var contentItem = ContentItemWithMappedChildren(mappedType, contentItemToken);
+                children.Add(contentItem);
+            }
+
+            var parentContentItem = (IBaseContentItemModel)parentContentItemToken.ToObject(mappedType)!;
+            parentContentItem.ContentItems = children;
+
+            return parentContentItem;
         }
 
         private static string GetContentType(string path)
