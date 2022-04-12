@@ -94,7 +94,6 @@ namespace DFC.Content.Pkg.Netcore.Services.CmsApiProcessorService
 
                 var hostWithPort = url.IsDefaultPort ? url.Host : $"{url.Host}:{url.Port}";
                 var uri = new Uri($"{url.Scheme}://{hostWithPort}/api/expand/{contentType}/{id}");
-                uri = new Uri($"http://localhost:7071/api/expand/{contentType}/{id}");
 
                 const int maxDepth = 5;
 
