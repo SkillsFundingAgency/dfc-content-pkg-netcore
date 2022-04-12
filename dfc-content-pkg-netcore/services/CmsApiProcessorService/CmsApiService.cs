@@ -94,6 +94,8 @@ namespace DFC.Content.Pkg.Netcore.Services.CmsApiProcessorService
 
                 var hostWithPort = url.IsDefaultPort ? url.Host : $"{url.Host}:{url.Port}";
                 var uri = new Uri($"{url.Scheme}://{hostWithPort}/api/expand/{contentType}/{id}");
+                uri = new Uri($"http://localhost:7071/api/expand/{contentType}/{id}");
+
                 const int maxDepth = 5;
 
                 var typesToInclude = contentTypeMappingService.Mappings
@@ -137,7 +139,7 @@ namespace DFC.Content.Pkg.Netcore.Services.CmsApiProcessorService
             return apiDataModel;
         }
 
-        private IBaseContentItemModel ContentItemWithMappedChildren(Type mappedType, JToken parentContentItemToken)
+        private IBaseContentItemModel ContentItemWithMappedChildren(Type parentMappedType, JToken parentContentItemToken)
         {
             // Clear out the content items, after taking a cut of them, as we need to map them separately.
             var contentItems = parentContentItemToken["ContentItems"];
@@ -148,13 +150,13 @@ namespace DFC.Content.Pkg.Netcore.Services.CmsApiProcessorService
             foreach (var contentItemToken in contentItems!)
             {
                 var contentType = (contentItemToken["ContentType"] as JValue)!.Value as string;
-                mappedType = contentTypeMappingService.GetMapping(contentType!)!;
+                var mappedType = contentTypeMappingService.GetMapping(contentType!)!;
 
                 var contentItem = ContentItemWithMappedChildren(mappedType, contentItemToken);
                 children.Add(contentItem);
             }
 
-            var parentContentItem = (IBaseContentItemModel)parentContentItemToken.ToObject(mappedType)!;
+            var parentContentItem = (IBaseContentItemModel)parentContentItemToken.ToObject(parentMappedType)!;
             parentContentItem.ContentItems = children;
 
             return parentContentItem;

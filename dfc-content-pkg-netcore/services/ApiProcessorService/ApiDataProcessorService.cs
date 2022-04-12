@@ -52,18 +52,19 @@ namespace DFC.Content.Pkg.Netcore.Services.ApiProcessorService
         public async Task<TApiModel?> PostAsync<TApiModel>(
             HttpClient? httpClient,
             Uri url,
-            Dictionary<string, object> parameters) where TApiModel : class
+            Dictionary<string, object> parameters)
+                where TApiModel : class
         {
             _ = httpClient ?? throw new ArgumentNullException(nameof(httpClient));
 
             var response = await apiService.PostAsync(httpClient, url, MediaTypeNames.Application.Json, parameters).ConfigureAwait(false);
 
-            if (!string.IsNullOrWhiteSpace(response))
+            if (string.IsNullOrWhiteSpace(response))
             {
-                return JsonConvert.DeserializeObject<TApiModel>(response);
+                throw new NullReferenceException();
             }
 
-            return default;
+            return JsonConvert.DeserializeObject<TApiModel>(response);
         }
 
         public async Task<HttpStatusCode> PostAsync(HttpClient? httpClient, Uri url)
