@@ -60,7 +60,6 @@ namespace DFC.Content.Pkg.Netcore.Services.ApiProcessorService
         public async Task<string?> PostAsync(HttpClient? httpClient, Uri url, string acceptHeader, Dictionary<string, object> parameters)
         {
             _ = httpClient ?? throw new ArgumentNullException(nameof(httpClient));
-
             logger.LogInformation("Loading data from {Url}", url);
 
             using var request = new HttpRequestMessage(HttpMethod.Post, url);
@@ -73,27 +72,39 @@ namespace DFC.Content.Pkg.Netcore.Services.ApiProcessorService
             try
             {
                 var response = await httpClient.SendAsync(request).ConfigureAwait(false);
-                string? responseString = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
+                var responseString = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
 
-                if (!response.IsSuccessStatusCode)
+                switch (response.IsSuccessStatusCode)
                 {
-                    logger.LogError($"Failed to get {acceptHeader} data from {url}, received error : '{responseString}', returning empty content.");
-                    responseString = null;
-                }
-                else if (response.StatusCode != System.Net.HttpStatusCode.OK)
-                {
-                    logger.LogInformation($"Status - {response.StatusCode} with response '{responseString}' received from {url}, returning empty content.");
-                    responseString = null;
-                }
+                    case true:
+                        if (response.StatusCode == HttpStatusCode.OK)
+                        {
+                            return responseString;
+                        }
 
-                return responseString;
+                        const string infoMsg =
+                            "Status - {StatusCode} with response '{responseString}' received from {url}, returning empty content.";
+
+                        logger.LogInformation(infoMsg, response.StatusCode, responseString, url);
+                        throw new Exception("Response returned something other than okay");
+                    case false:
+                    {
+                        const string errorMsg =
+                            "Failed to get {acceptHeader} data from {url}, received error : '{responseString}', returning empty content.";
+
+                        logger.LogError(errorMsg, acceptHeader, url, responseString);
+                        throw new Exception("Response returned an error code.");
+                    }
+                }
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, $"Error received getting {acceptHeader} data '{ex.InnerException?.Message}'. Received from {url}, returning empty content");
-            }
+                const string errorMsg =
+                    "Error received getting {acceptHeader} data '{Message}'. Received from {url}, returning empty content";
 
-            return default;
+                logger.LogError(ex, errorMsg, acceptHeader, ex.InnerException?.Message, url);
+                throw;
+            }
         }
 
         public async Task<HttpStatusCode> PostAsync(HttpClient? httpClient, Uri url)
