@@ -85,7 +85,7 @@ namespace DFC.Content.Pkg.Netcore.Services.CmsApiProcessorService
         public async Task<TModel?> GetItemAsync<TModel>(Uri url, CmsApiOptions options)
            where TModel : class, IBaseContentItemModel
         {
-            var useExpandFunction = !IsSummaryRequest(url?.ToString());
+            var useExpandFunction = !IsSummaryRequest(url.ToString());
 
             if (useExpandFunction)
             {
@@ -146,19 +146,29 @@ namespace DFC.Content.Pkg.Netcore.Services.CmsApiProcessorService
 
             var children = new List<IBaseContentItemModel>();
 
-            foreach (var contentItemToken in contentItems!)
+            if (contentItems != null)
             {
-                var contentType = (contentItemToken["ContentType"] as JValue)!.Value as string;
-                var mappedType = contentTypeMappingService.GetMapping(contentType!)!;
+                foreach (var contentItemToken in contentItems)
+                {
+                    var contentType = (contentItemToken["ContentType"] as JValue) !.Value as string;
+                    var mappedType = contentTypeMappingService.GetMapping(contentType!) !;
 
-                var contentItem = ContentItemWithMappedChildren(mappedType, contentItemToken);
-                children.Add(contentItem);
+                    var contentItem = ContentItemWithMappedChildren(mappedType, contentItemToken);
+                    children.Add(contentItem);
+                }
             }
 
-            var parentContentItem = (IBaseContentItemModel)parentContentItemToken.ToObject(parentMappedType)!;
-            parentContentItem.ContentItems = children;
+            try
+            {
+                var parentContentItem = (IBaseContentItemModel)parentContentItemToken.ToObject(parentMappedType) !;
+                parentContentItem.ContentItems = children;
 
-            return parentContentItem;
+                return parentContentItem;
+            }
+            catch
+            {
+                return default;
+            }
         }
 
         private static string GetContentType(string path)

@@ -12,6 +12,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
+using Microsoft.VisualStudio.TestPlatform.Utilities;
 using Xunit;
 
 namespace DFC.Content.Pkg.Netcore.CmsApiProcessorService.UnitTests
@@ -124,7 +125,7 @@ namespace DFC.Content.Pkg.Netcore.CmsApiProcessorService.UnitTests
             var result = await cmsApiService.GetItemAsync<ApiItemNoChildrenModel>(url).ConfigureAwait(false);
 
             // assert
-            A.CallTo(() => fakeApiDataProcessorService.PostAsync<ApiItemNoChildrenModel>(A<HttpClient>.Ignored, A<Uri>.Ignored, A<Dictionary<string, object>>.Ignored)).MustHaveHappenedOnceExactly();
+            A.CallTo(() => fakeApiDataProcessorService.PostAsync<JObject>(A<HttpClient>.Ignored, A<Uri>.Ignored, A<Dictionary<string, object>>.Ignored)).MustHaveHappenedOnceExactly();
             A.Equals(result, expectedResult);
         }
 
