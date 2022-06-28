@@ -97,7 +97,7 @@ namespace DFC.Content.Pkg.Netcore.Services.CmsApiProcessorService
                 var (contentType, id) = GetContentTypeAndId(url.ToString());
                 var multiDirectional = url.ToString().Split('?')[0].EndsWith("/true", StringComparison.InvariantCultureIgnoreCase);
                 var checkAncestryById = url.ToString().Contains("?checkAncestryById=true", StringComparison.InvariantCultureIgnoreCase);
- 
+
                 var hostWithPort = url.IsDefaultPort ? url.Host : $"{url.Host}:{url.Port}";
                 var uri = new Uri($"{url.Scheme}://{hostWithPort}/api/expand/{contentType}/{id}");
 
