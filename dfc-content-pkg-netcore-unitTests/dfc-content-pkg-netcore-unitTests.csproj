@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <TargetFramework>net6.0</TargetFramework>
     <RootNamespace>DFC.Content.Pkg.Netcore.UnitTests</RootNamespace>
     <ProjectGuid>{9F73BF47-B6EF-4F40-9A51-F026B21A91CF}</ProjectGuid>
     <IsPackable>false</IsPackable>
@@ -16,7 +16,7 @@
 
   <ItemGroup>
     <PackageReference Include="FakeItEasy" Version="6.2.1" />
-	<PackageReference Include="Microsoft.CodeAnalysis.FxCopAnalyzers" Version="3.3.0">
+	<PackageReference Include="Microsoft.CodeAnalysis.NetAnalyzers" Version="7.0.0">
 		<PrivateAssets>all</PrivateAssets>
 		<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
 	</PackageReference>
