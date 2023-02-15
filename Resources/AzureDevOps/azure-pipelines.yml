@@ -28,4 +28,5 @@ stages:
         SolutionBaseName: $(SolutionBaseName)
         BuildPlatform: 'any cpu'
         BuildConfiguration: 'release'
+        DotNetCoreVersion: '6.0.100'
         TestSuffix: 'UnitTests'
