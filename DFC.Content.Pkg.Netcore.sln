@@ -2,10 +2,6 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.3.32819.101
 MinimumVisualStudioVersion = 15.0.26124.0
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DFC.Content.Pkg.Netcore", "dfc-content-pkg-netcore\DFC.Content.Pkg.Netcore.csproj", "{14DC1FC5-B9C8-428C-ABB9-255AE80D7D15}"
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{FAFC8842-BDA5-4079-ACC5-A1A0C97D3E2C}"
-EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "_Solution Items", "_Solution Items", "{81E4CA71-73AD-4479-BA34-7EA425B56175}"
 	ProjectSection(SolutionItems) = preProject
 		.gitattributes = .gitattributes
@@ -18,7 +14,9 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "_Solution Items", "_Solutio
 		UnitTests.CodeAnalysis.ruleset = UnitTests.CodeAnalysis.ruleset
 	EndProjectSection
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DFC.Content.Pkg.Netcore.UnitTests", "dfc-content-pkg-netcore-unitTests\DFC.Content.Pkg.Netcore.UnitTests.csproj", "{9F73BF47-B6EF-4F40-9A51-F026B21A91CF}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DFC.Content.Pkg.Netcore", "DFC.Content.Pkg.Netcore\DFC.Content.Pkg.Netcore.csproj", "{14DC1FC5-B9C8-428C-ABB9-255AE80D7D15}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DFC.Content.Pkg.Netcore.UnitTests", "DFC.Content.Pkg.Netcore.UnitTests\DFC.Content.Pkg.Netcore.UnitTests.csproj", "{9F73BF47-B6EF-4F40-9A51-F026B21A91CF}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -37,9 +35,6 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
-	EndGlobalSection
-	GlobalSection(NestedProjects) = preSolution
-		{9F73BF47-B6EF-4F40-9A51-F026B21A91CF} = {FAFC8842-BDA5-4079-ACC5-A1A0C97D3E2C}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {B8269F43-233B-4290-8BD0-DF76C16DC579}
