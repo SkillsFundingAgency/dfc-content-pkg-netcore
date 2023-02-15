@@ -37,7 +37,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\dfc-content-pkg-netcore\DFC.Content.Pkg.Netcore.csproj" />
+    <ProjectReference Include="..\DFC.Content.Pkg.Netcore\DFC.Content.Pkg.Netcore.csproj" />
   </ItemGroup>
 
 </Project>
