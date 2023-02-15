@@ -9,7 +9,7 @@ resources:
   - repository: dfc-devops
     type: github
     name: SkillsFundingAgency/dfc-devops
-    ref: refs/dotnet6_appname
+    ref: refs/dotnetUpgrade
     endpoint: 'GitHub (ESFA)'
 
 stages:
