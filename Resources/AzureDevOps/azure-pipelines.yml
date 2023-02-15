@@ -12,6 +12,12 @@ resources:
     ref: refs/tags/v1.8.5
     endpoint: 'GitHub (ESFA)'
 
+pool:
+  name: NCS - CI and CD
+  demands:
+  - msbuild
+  - visualstudio
+
 stages:
 - stage: Build
   displayName: Build, Test and Analyze
