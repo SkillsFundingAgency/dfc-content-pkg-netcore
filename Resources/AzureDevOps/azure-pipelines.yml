@@ -70,3 +70,4 @@ stages:
               packagesToPush: '$(Pipeline.Workspace)\$(SolutionBaseName).Nuget\*.nupkg;!$(Pipeline.Workspace)\$(SolutionBaseName).Nuget\*.symbols.nupkg'
               nuGetFeedType: external
               publishFeedCredentials: 'DFC Nuget'
+
