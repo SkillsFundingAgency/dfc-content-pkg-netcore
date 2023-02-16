@@ -42,3 +42,32 @@ stages:
       inputs:
         targetPath: $(build.artifactstagingdirectory)\DeploymentPackages\Nuget
         artifactName: $(SolutionBaseName).Nuget
+        - stage: PublishPackage
+
+- stage: Deploy   
+  displayName: Publish Package to NuGet
+  condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master')) 
+  jobs:  
+  - job: CleanArtifacts  
+    displayName: Clean artifacts directory
+    workspace:
+      clean: all
+  - deployment: PublishNugetPackage
+    dependsOn: CleanArtifacts
+    environment: CONTENT_NUGET
+    pool:
+      name: NCS - CI and CD
+      demands:
+      - msbuild
+      - visualstudio
+    strategy:
+      runOnce:
+        deploy:
+          steps:
+          - task: NuGetCommand@2
+            displayName: 'NuGet push'
+            inputs:
+              command: push
+              packagesToPush: '$(Pipeline.Workspace)\$(SolutionBaseName).Nuget\*.nupkg;!$(Pipeline.Workspace)\$(SolutionBaseName).Nuget\*.symbols.nupkg'
+              nuGetFeedType: external
+              publishFeedCredentials: 'DFC Nuget'
